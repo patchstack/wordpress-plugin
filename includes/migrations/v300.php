@@ -6,7 +6,10 @@ if (!defined('ABSPATH')) {
 }
 
 // Migrate all current options to the new prefix.
-$wpdb->query( 'INSERT IGNORE INTO ' . $wpdb->prefix . "options (option_name, option_value, autoload) SELECT REPLACE(option_name, 'webarx_', 'patchstack_') as option_name, option_value, autoload FROM " . $wpdb->prefix . "options WHERE option_name like 'webarx_%'" );
-$wpdb->query( 'UPDATE ' . $wpdb->prefix . 'options AS a SET option_value = (SELECT option_value FROM ' . $wpdb->prefix . "options WHERE option_name = REPLACE(a.option_name, 'patchstack_', 'webarx_')) WHERE option_name LIKE 'patchstack_%'" );
+$exists = $wpdb->get_var( "SELECT COUNT(*) FROM " . $wpdb->prefix . "options WHERE option_name = 'webarx_api_token'" );
+if ( !is_null( $exists ) && $exists >= 1 ) {
+	$wpdb->query( 'INSERT IGNORE INTO ' . $wpdb->prefix . "options (option_name, option_value, autoload) SELECT REPLACE(option_name, 'webarx_', 'patchstack_') as option_name, option_value, autoload FROM " . $wpdb->prefix . "options WHERE option_name like 'webarx_%'" );
+	$wpdb->query( 'UPDATE ' . $wpdb->prefix . 'options AS a SET option_value = (SELECT option_value FROM ' . $wpdb->prefix . "options WHERE option_name = REPLACE(a.option_name, 'patchstack_', 'webarx_')) WHERE option_name LIKE 'patchstack_%'" );
+}
 
 update_option('patchstack_db_version', '3.0.0');

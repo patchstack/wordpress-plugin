@@ -92,20 +92,6 @@ class P_Activation extends P_Core {
 			return false;
 		}
 
-		// Check if the webarx/webarx.php plugin is present, if so, remove it.
-		if ( is_dir( WP_PLUGIN_DIR . '/webarx' ) ) {
-
-			// Migrate all current options to the new prefix.
-			global $wpdb;
-			$wpdb->query( 'INSERT IGNORE INTO ' . $wpdb->prefix . "options (option_name, option_value, autoload) SELECT REPLACE(option_name, 'webarx_', 'patchstack_') as option_name, option_value, autoload FROM " . $wpdb->prefix . "options WHERE option_name like 'webarx_%'" );
-			$wpdb->query( 'UPDATE ' . $wpdb->prefix . 'options AS a SET option_value = (SELECT option_value FROM ' . $wpdb->prefix . "options WHERE option_name = REPLACE(a.option_name, 'patchstack_', 'webarx_')) WHERE option_name LIKE 'patchstack_%'" );
-
-			// Deactivate the plugin.
-			include_once ABSPATH . 'wp-admin/includes/plugin.php';
-			deactivate_plugins( array( 'webarx/webarx.php' ) );
-			update_option( 'patchstack_license_free', '0' );
-		}
-
 		return true;
 	}
 
@@ -137,6 +123,25 @@ class P_Activation extends P_Core {
 		if ( ! $this->check_requirements() ) {
 			$this->requirements_not_met_notice();
 			exit;
+		}
+
+		// Check if the webarx/webarx.php plugin is present, if so, remove it.
+		if ( is_dir( WP_PLUGIN_DIR . '/webarx' ) ) {
+
+			// Migrate all current options to the new prefix.
+			global $wpdb;
+			$exists = $wpdb->get_var( "SELECT COUNT(*) FROM " . $wpdb->prefix . "options WHERE option_name = 'webarx_api_token'" );
+			
+			// Move over the options.
+			if ( !is_null( $exists ) && $exists >= 1 ) {
+				$wpdb->query( 'INSERT IGNORE INTO ' . $wpdb->prefix . "options (option_name, option_value, autoload) SELECT REPLACE(option_name, 'webarx_', 'patchstack_') as option_name, option_value, autoload FROM " . $wpdb->prefix . "options WHERE option_name like 'webarx_%'" );
+				$wpdb->query( 'UPDATE ' . $wpdb->prefix . 'options AS a SET option_value = (SELECT option_value FROM ' . $wpdb->prefix . "options WHERE option_name = REPLACE(a.option_name, 'patchstack_', 'webarx_')) WHERE option_name LIKE 'patchstack_%'" );
+			}
+
+			// Deactivate the plugin.
+			include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			deactivate_plugins( array( 'webarx/webarx.php' ) );
+			update_option( 'patchstack_license_free', '0' );
 		}
 
 		// Make sure any rewrite functionality has been loaded.
