@@ -100,27 +100,9 @@ class P_Activation extends P_Core {
 			$wpdb->query( 'INSERT IGNORE INTO ' . $wpdb->prefix . "options (option_name, option_value, autoload) SELECT REPLACE(option_name, 'webarx_', 'patchstack_') as option_name, option_value, autoload FROM " . $wpdb->prefix . "options WHERE option_name like 'webarx_%'" );
 			$wpdb->query( 'UPDATE ' . $wpdb->prefix . 'options AS a SET option_value = (SELECT option_value FROM ' . $wpdb->prefix . "options WHERE option_name = REPLACE(a.option_name, 'patchstack_', 'webarx_')) WHERE option_name LIKE 'patchstack_%'" );
 
-			// Remove the plugin.
+			// Deactivate the plugin.
 			include_once ABSPATH . 'wp-admin/includes/plugin.php';
-			$delete = delete_plugins( array( 'webarx/webarx.php' ) );
-
-			// Failure?
-			if ( $delete !== true ) {
-				$this->activation_errors[] = 'An older Patchstack plugin is installed and could not be automatically removed. Please manually remove the Patchstack or WebARX plugin older than 2.1.0 first and then install this plugin again.';
-
-				// Null means filesystem related error.
-				if ( is_null( $delete ) ) {
-					$this->activation_errors[] = 'Detailed error: filesystem credentials are required to proceed the automatic deletion of the older Patchstack plugin.';
-				}
-
-				// WP_Error instance means other type of failure.
-				if ( is_wp_error( $delete ) ) {
-					$this->activation_errors[] = 'Detailed error: ' . $delete->get_error_message();
-				}
-
-				return false;
-			}
-
+			deactivate_plugins( array( 'webarx/webarx.php' ) );
 			update_option( 'patchstack_license_free', '0' );
 		}
 
@@ -262,7 +244,7 @@ class P_Activation extends P_Core {
 	 */
 	public function migrate_check() {
 		// Only perform migrations if we have any to execute.
-		$versions = array();
+		$versions = array('3.0.0');
 		if ( count( $versions ) == 0 ) {
 			return;
 		}
