@@ -71,6 +71,10 @@ class P_Listener extends P_Core {
 		$id  = get_option( 'patchstack_clientid' );
 		$key = get_option( 'patchstack_secretkey' );
 
+		if ( empty( $id ) || empty ( $key ) ) {
+			return false;
+		}
+
 		// Timeout of 2 minutes.
 		for ( $ts = $date->getTimestamp(), $x = 0; $x <= 120; $ts = $date->modify( '+1 seconds' )->getTimestamp() ) {
 			if ( password_verify( $id . $key . $ts, $token ) ) {
@@ -92,6 +96,11 @@ class P_Listener extends P_Core {
 	private function isAuthorizedOld( $secret ) {
 		$id  = get_option( 'patchstack_clientid' );
 		$key = get_option( 'patchstack_secretkey' );
+
+		if ( empty( $id ) || empty ( $key ) ) {
+			return false;
+		}
+
 		return $secret === sha1( $id . $key );
 	}
 
