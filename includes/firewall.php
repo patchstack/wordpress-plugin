@@ -146,11 +146,21 @@ class P_Firewall extends P_Core {
 			}
 
 			foreach ( $requests as $key => $request ) {
+
+				// Treat the raw POST data string as the body contents of all values combined.
+				if ( $key == 'rulesRawPost' ) {
+					$key = 'rulesBodyAll';
+				}
+				
 				if ( $whitelist_rule->method == $requests['method'] || $whitelist_rule->method == 'ALL' ) {
 					$test = strtolower( preg_replace( '/(?!^)[A-Z]{2,}(?=[A-Z][a-z])|[A-Z][a-z]/', '->$0', $key ) );
 					$rule = array_reduce(
 						explode( '->', $test ),
 						function ( $o, $p ) {
+							if ( ! isset( $o->$p ) ) {
+								return null;
+							}
+							
 							return $o->$p;
 						},
 						$whitelist_rule
@@ -529,6 +539,10 @@ class P_Firewall extends P_Core {
 					$rule = array_reduce(
 						$exp,
 						function ( $o, $p ) {
+							if ( ! isset( $o->$p ) ) {
+								return null;
+							}
+
 							return $o->$p;
 						},
 						$rule_terms

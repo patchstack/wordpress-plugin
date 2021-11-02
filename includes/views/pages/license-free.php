@@ -31,7 +31,7 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 			<?php echo __( 'Set up Patchstack', 'patchstack' ); ?>
 		</a>
 
-		<a href="https://patchstack.com/features/" target="_blank" class="patchstack-activate button-primary ps-b2" style="<?php echo ! $status ? 'display: none;' : ''; ?>">
+		<a href="https://patchstack.com/pricing/" target="_blank" class="patchstack-activate button-primary ps-b2" style="<?php echo ! $status ? 'display: none;' : ''; ?>">
 			<?php echo __( 'See full list of Features', 'patchstack' ); ?>
 		</a>
 	</div>

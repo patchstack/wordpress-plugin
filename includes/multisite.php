@@ -136,12 +136,14 @@ class P_Multisite extends P_Core {
 	private function save_options( $options ) {
 		if ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) {
 			foreach ( $options as $option ) {
-				$value = isset( $_POST[ $option ] ) ? wp_filter_nohtml_kses( $_POST[ $option ] ) : 0;
+				$value = isset( $_POST[ $option ] ) ? $_POST[ $option ] : 0;
+				$value = map_deep($value, 'wp_filter_nohtml_kses');
 				update_site_option( $option, $value );
 			}
 		} else {
 			foreach ( $options as $option ) {
-				$value = isset( $_POST[ $option ] ) ? wp_filter_nohtml_kses( $_POST[ $option ] ) : 0;
+				$value = isset( $_POST[ $option ] ) ? $_POST[ $option ] : 0;
+				$value = map_deep($value, 'wp_filter_nohtml_kses');
 				update_option( $option, $value );
 			}
 		}

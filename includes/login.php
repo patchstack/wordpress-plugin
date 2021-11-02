@@ -148,10 +148,19 @@ class P_Login extends P_Core {
 			return;
 		}
 
+		// Calculate block time.
+		$minutes = (int) $this->get_option( 'patchstack_anti_bruteforce_minutes', 30 );
+		$timeout = (int) $this->get_option( 'patchstack_anti_bruteforce_blocktime', 60 );
+		if ( empty( $minutes ) || empty( $timeout ) ) {
+			$time = 30 + 60;
+		} else {
+			$time = $minutes + $timeout;
+		}
+
 		// Check if X failed login attempts were made.
 		global $wpdb;
 		$results = $wpdb->get_results(
-			$wpdb->prepare( 'SELECT COUNT(*) AS numIps FROM ' . $wpdb->prefix . "patchstack_event_log WHERE ip = '%s' AND action = 'failed login' AND date >= ('" . current_time( 'mysql' ) . "' - INTERVAL %d MINUTE)", array( $ip, ( $this->get_option( 'patchstack_anti_bruteforce_blocktime', 60 ) + $this->get_option( 'patchstack_anti_bruteforce_minutes', 5 ) ) ) ),
+			$wpdb->prepare( 'SELECT COUNT(*) AS numIps FROM ' . $wpdb->prefix . "patchstack_event_log WHERE ip = '%s' AND action = 'failed login' AND date >= ('" . current_time( 'mysql' ) . "' - INTERVAL %d MINUTE)", array( $ip, $time ) ),
 			OBJECT
 		);
 

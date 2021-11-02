@@ -517,9 +517,18 @@ class P_Listener extends P_Core {
 	 * @return void
 	 */
 	private function getFirewallBans() {
+		// Calculate block time.
+		$minutes = (int) $this->get_option( 'patchstack_autoblock_minutes', 30 );
+		$timeout = (int) $this->get_option( 'patchstack_autoblock_blocktime', 60 );
+		if ( empty( $minutes ) || empty( $timeout ) ) {
+			$time = 30 + 60;
+		} else {
+			$time = $minutes + $timeout;
+		}
+
 		global $wpdb;
 		$results = $wpdb->get_results(
-			$wpdb->prepare( 'SELECT ip FROM ' . $wpdb->prefix . "patchstack_firewall_log WHERE apply_ban = 1 AND log_date >= ('" . current_time( 'mysql' ) . "' - INTERVAL %d MINUTE) GROUP BY ip", array( ( $this->get_option( 'patchstack_autoblock_minutes', 30 ) + $this->get_option( 'patchstack_autoblock_blocktime', 60 ) ) ) ),
+			$wpdb->prepare( 'SELECT ip FROM ' . $wpdb->prefix . "patchstack_firewall_log WHERE apply_ban = 1 AND log_date >= ('" . current_time( 'mysql' ) . "' - INTERVAL %d MINUTE) GROUP BY ip", array( $time ) ),
 			OBJECT
 		);
 
@@ -575,10 +584,19 @@ class P_Listener extends P_Core {
 	 * @return void
 	 */
 	private function getLoginBans() {
+		// Calculate block time.
+		$minutes = (int) $this->get_option( 'patchstack_anti_bruteforce_minutes', 30 );
+		$timeout = (int) $this->get_option( 'patchstack_anti_bruteforce_blocktime', 60 );
+		if ( empty( $minutes ) || empty( $timeout ) ) {
+			$time = 30 + 60;
+		} else {
+			$time = $minutes + $timeout;
+		}
+
 		// Check if X failed login attempts were made.
 		global $wpdb;
 		$results = $wpdb->get_results(
-			$wpdb->prepare( 'SELECT id, ip, date FROM ' . $wpdb->prefix . "patchstack_event_log WHERE action = 'failed login' AND date >= ('" . current_time( 'mysql' ) . "' - INTERVAL %d MINUTE) GROUP BY ip HAVING COUNT(ip) >= %d ORDER BY date DESC", array( ( $this->get_option( 'patchstack_anti_bruteforce_blocktime', 60 ) + $this->get_option( 'patchstack_anti_bruteforce_minutes', 5 ) ), $this->get_option( 'patchstack_anti_bruteforce_attempts', 10 ) ) ),
+			$wpdb->prepare( 'SELECT id, ip, date FROM ' . $wpdb->prefix . "patchstack_event_log WHERE action = 'failed login' AND date >= ('" . current_time( 'mysql' ) . "' - INTERVAL %d MINUTE) GROUP BY ip HAVING COUNT(ip) >= %d ORDER BY date DESC", array( $time, $this->get_option( 'patchstack_anti_bruteforce_attempts', 10 ) ) ),
 			OBJECT
 		);
 
