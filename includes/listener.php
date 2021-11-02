@@ -20,7 +20,7 @@ class P_Listener extends P_Core {
 		parent::__construct( $core );
 
 		// Only hook into the action if the authentication is set and valid.
-		if ( isset( $_POST['webarx_secret'] ) && ( $this->authenticated( $_POST['webarx_secret'] ) || $this->isAuthorizedOld( $_POST['webarx_secret'] ) ) ) {
+		if ( isset( $_POST['webarx_secret'] ) && $this->verifyToken( $_POST['webarx_secret'] ) ) {
 			add_action( 'init', array( $this, 'handleRequest' ) );
 		}
 	}
@@ -59,49 +59,20 @@ class P_Listener extends P_Core {
 	}
 
 	/**
-	 * Check if incoming token is valid.
-	 *
-	 * @param $token
-	 * @return bool
-	 */
-
-	private function authenticated( $token ) {
-		$date = new \DateTime();
-		$date->modify( '-120 seconds' );
-		$id  = get_option( 'patchstack_clientid' );
-		$key = get_option( 'patchstack_secretkey' );
-
-		if ( empty( $id ) || empty ( $key ) ) {
-			return false;
-		}
-
-		// Timeout of 2 minutes.
-		for ( $ts = $date->getTimestamp(), $x = 0; $x <= 120; $ts = $date->modify( '+1 seconds' )->getTimestamp() ) {
-			if ( password_verify( $id . $key . $ts, $token ) ) {
-				return true;
-			}
-
-			$x++;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Determine if the provided secret hash equals the sha1 of the private id and key.
 	 *
 	 * @param string $secret Hash that is sent from our API.
 	 * @return boolean
 	 */
-	private function isAuthorizedOld( $secret ) {
+	private function verifyToken( $secret ) {
 		$id  = get_option( 'patchstack_clientid' );
 		$key = get_option( 'patchstack_secretkey' );
 
-		if ( empty( $id ) || empty ( $key ) ) {
+		if ( empty( $id ) || empty ( $key ) || strlen( $secret ) != 40) {
 			return false;
 		}
 
-		return $secret === sha1( $id . $key );
+		return hash_equals( sha1( $id . $key ), $secret );
 	}
 
 	/**
