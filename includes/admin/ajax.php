@@ -25,9 +25,6 @@ class P_Admin_Ajax extends P_Core {
 
 			// License related actions.
 			add_action( 'wp_ajax_activate_license', array( $this, 'activate_license' ) );
-
-			// Hide login related actions.
-			add_action( 'wp_ajax_send_new_url_email', array( $this, 'send_new_url_email' ) );
 		}
 	}
 
@@ -168,15 +165,5 @@ class P_Admin_Ajax extends P_Core {
 			$results['response'] = $response;
 			wp_send_json( $results );
 		}
-	}
-
-	/**
-	 * Send an email to the current logged in user that contains the new admin page URL.
-	 *
-	 * @return void
-	 */
-	public function send_new_url_email() {
-		$success = $this->plugin->hide_login->send_email();
-		die( $success ? 'success' : 'fail' );
 	}
 }

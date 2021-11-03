@@ -121,11 +121,7 @@ class P_Admin_Options extends P_Core {
 		'patchstack_license_free'                       => 0,
 		'patchstack_api_token'                          => '',
 		'patchstack_whitelist'                          => '',
-		'patchstack_show_settings'                      => 0,
-
-		// Admin page rename options.
-		'patchstack_mv_wp_login'                        => 0,
-		'patchstack_rename_wp_login'                    => 'swlogin',
+		'patchstack_show_settings'                      => 0
 	);
 
 	/**
@@ -210,10 +206,6 @@ class P_Admin_Options extends P_Core {
 		add_settings_field( 'patchstack_whitelist', __( 'Whitelist', 'patchstack' ), array( $this, 'patchstack_whitelist_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_wlbl' );
 
 		// Login protection.
-		if ( ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) && floatval( substr( phpversion(), 0, 5 ) ) > 5.5 ) {
-			add_settings_field( 'patchstack_mv_wp_login', __( 'Move and rename login page', 'patchstack' ), array( $this, 'patchstack_hidewplogin_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login' );
-			add_settings_field( 'patchstack_rename_wp_login', '', array( $this, 'patchstack_hidewplogin_rename_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login' );
-		}
 		add_settings_field( 'patchstack_block_bruteforce_ips', __( 'Automatic brute-force IP ban', 'patchstack' ), array( $this, 'patchstack_block_bruteforce_ips_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login' );
 		add_settings_field( 'patchstack_login_time_block', __( 'Logon hours', 'patchstack' ), array( $this, 'patchstack_login_time_block_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login' );
 		add_settings_field( 'patchstack_login_2fa', __( 'Two Factor Authentication', 'patchstack' ), array( $this, 'patchstack_login_2fa_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login_2fa' );
@@ -238,7 +230,7 @@ class P_Admin_Options extends P_Core {
 			'hardening'    => array( 'patchstack_auto_update', 'patchstack_json_is_disabled', 'patchstack_register_email_blacklist', 'patchstack_pluginedit', 'patchstack_basicscanblock', 'patchstack_userenum', 'patchstack_rm_readme', 'patchstack_hidewpcontent', 'patchstack_hidewpversion', 'patchstack_activity_log_is_enabled', 'patchstack_activity_log_failed_logins', 'patchstack_activity_log_failed_logins_db', 'patchstack_movewpconfig', 'patchstack_captcha_on_comments', 'patchstack_captcha_login_form', 'patchstack_captcha_registration_form', 'patchstack_captcha_reset_pwd_form', 'patchstack_captcha_public_key', 'patchstack_captcha_private_key', 'patchstack_captcha_type', 'patchstack_captcha_public_key_v3', 'patchstack_captcha_private_key_v3', 'patchstack_captcha_public_key_v3_new', 'patchstack_captcha_private_key_v3_new', 'patchstack_xmlrpc_is_disabled', 'patchstack_application_passwords_disabled' ),
 			'firewall'     => array( 'patchstack_geo_block_enabled', 'patchstack_geo_block_inverse', 'patchstack_basic_firewall_geo_countries', 'patchstack_ip_block_list', 'patchstack_prevent_default_file_access', 'patchstack_basic_firewall', 'patchstack_firewall_ip_header', 'patchstack_basic_firewall_roles', 'patchstack_disable_htaccess', 'patchstack_add_security_headers', 'patchstack_known_blacklist', 'patchstack_block_debug_log_access', 'patchstack_block_fake_bots', 'patchstack_index_views', 'patchstack_proxy_comment_posting', 'patchstack_bad_query_strings', 'patchstack_advanced_character_string_filter', 'patchstack_advanced_blacklist_firewall', 'patchstack_forbid_rfi', 'patchstack_image_hotlinking', 'patchstack_firewall_custom_rules', 'patchstack_firewall_custom_rules_loc', 'patchstack_blackhole_log', 'patchstack_whitelist', 'patchstack_autoblock_blocktime', 'patchstack_autoblock_attempts', 'patchstack_autoblock_minutes' ),
 			'cookienotice' => array( 'patchstack_enable_cookie_notice_message', 'patchstack_cookie_notice_message', 'patchstack_cookie_notice_backgroundcolor', 'patchstack_cookie_notice_textcolor', 'patchstack_cookie_notice_privacypolicy_enable', 'patchstack_cookie_notice_privacypolicy_text', 'patchstack_cookie_notice_privacypolicy_link', 'patchstack_cookie_notice_cookie_expiration', 'patchstack_cookie_notice_opacity', 'patchstack_cookie_notice_accept_text', 'patchstack_cookie_notice_credits' ),
-			'login'        => array( 'patchstack_mv_wp_login', 'patchstack_rename_wp_login', 'patchstack_block_bruteforce_ips', 'patchstack_anti_bruteforce_attempts', 'patchstack_anti_bruteforce_minutes', 'patchstack_anti_bruteforce_blocktime', 'patchstack_login_time_block', 'patchstack_login_time_start', 'patchstack_login_time_end', 'patchstack_login_2fa', 'patchstack_login_blocked', 'patchstack_login_whitelist' ),
+			'login'        => array( 'patchstack_block_bruteforce_ips', 'patchstack_anti_bruteforce_attempts', 'patchstack_anti_bruteforce_minutes', 'patchstack_anti_bruteforce_blocktime', 'patchstack_login_time_block', 'patchstack_login_time_start', 'patchstack_login_time_end', 'patchstack_login_2fa', 'patchstack_login_blocked', 'patchstack_login_whitelist' ),
 		);
 
 		foreach ( $settings as $key => $setting ) {
@@ -389,27 +381,6 @@ class P_Admin_Options extends P_Core {
 	public function patchstack_cookie_notice_opacity_callback() {
 		echo wp_kses( "<input min=1 max=100 type='number' name='patchstack_cookie_notice_opacity' id='patchstack_cookie_notice_opacity' value='" . esc_attr( $this->get_option( 'patchstack_cookie_notice_opacity' ) ) . "'>", $this->allowed_html );
 		echo wp_kses( '<br /><label for="patchstack_cookie_notice_opacity"><i>min: 1 - max: 99 - no opacity: 100</i></label>', $this->allowed_html );
-	}
-
-	public function patchstack_hidewplogin_input() {
-		$string1 = __( 'Move login page to hide it from hackers and seekers.', 'patchstack' );
-		$string1 = __( 'Hide wp-login and wp-admin page from attackers.', 'patchstack' );
-		echo wp_kses( '<input type="checkbox" name="patchstack_mv_wp_login" id="patchstack_mv_wp_login" value="1" ' . checked( 1, $this->get_option( 'patchstack_mv_wp_login' ), false ) . '/><label for="patchstack_mv_wp_login"><i>' . $string1 . '</i></label>' , $this->allowed_html );
-	}
-
-	public function patchstack_hidewplogin_rename_input() {
-		echo wp_kses( '<label><i style="color:red;">We do not recommend enabling this when you already have renamed your admin folder or when you make use of a system that allows regular users to login.</i></label><br /><br /><label style="font-weight: 300; color: #d0d0d0;"> ' . get_site_url() . '/ </label><input type="text" name="patchstack_rename_wp_login" id="patchstack_rename_wp_login" value="' . esc_attr( $this->get_option( 'patchstack_rename_wp_login' ) ) . '" />  <i style="color: #fff">New login page</i>' , $this->allowed_html );
-		if ( $this->get_option( 'patchstack_mv_wp_login' ) && $this->get_option( 'patchstack_rename_wp_login' ) ) {
-			$request  = wp_remote_get( get_site_url() . '/' . $this->get_option( 'patchstack_rename_wp_login' ), array( 'sslverify' => false ) );
-			$response = wp_remote_retrieve_body( $request );
-			if ( ! strpos( $response, $this->get_option( 'patchstack_rename_wp_login' ) ) ) {
-				update_site_option( 'patchstack_mv_wp_login', 0 );
-				echo wp_kses( '<div class="error notice is-dismissible" style="margin-left: 0px );"><p style="color: #000000;">' . __( 'Patchstack custom login page could not be activated due to your environment setup, it may be conflict with other plugin or specific .htaccess rules.', 'patchstack' ) . '</p></div>', $this->allowed_html );
-			} else {
-				echo wp_kses( '<br /><br /><div style="font-weight: 300; color: #d0d0d0;">Your login page is now here:  <a href="' . get_site_url() . '/' . esc_attr( $this->get_option( 'patchstack_rename_wp_login' ) ) . '">' . get_site_url() . '/' . esc_attr( $this->get_option( 'patchstack_rename_wp_login' ) ) . '</div></a>', $this->allowed_html );
-				echo wp_kses( '<br /><input type="submit" id="patchstack_send_mail_url" name="patchstack_send_mail_url" value="Send the link to your admin email." class="button-primary" />', $this->allowed_html );
-			}
-		}
 	}
 
 	public function patchstack_pluginedit_input() {

@@ -3,7 +3,7 @@
  * Plugin Name: Patchstack Security
  * Plugin URI:  https://patchstack.com
  * Description: Patchstack identifies security vulnerabilities in WordPress plugins, themes, and core.
- * Version: 2.1.5
+ * Version: 2.1.6
  * Author: Patchstack
  * License: GPLv3
  * Text Domain: patchstack
@@ -58,7 +58,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 		 *
 		 * @var string
 		 */
-		const VERSION = '2.1.5';
+		const VERSION = '2.1.6';
 
 		/**
 		 * API URL of Patchstack to communicate with.
@@ -146,7 +146,6 @@ if ( ! class_exists( 'patchstack' ) ) {
 		protected $hacker_log;
 		protected $upload;
 		protected $rules;
-		protected $hide_login;
 		protected $listener;
 		protected $event_log;
 		protected $multisite;
@@ -197,7 +196,6 @@ if ( ! class_exists( 'patchstack' ) ) {
 				'hacker_log'    => 'P_Hacker_Log',
 				'upload'        => 'P_Upload',
 				'rules'         => 'P_Rules',
-				'hide_login'    => 'P_Hide_Login',
 				'listener'      => 'P_Listener',
 				'event_log'     => 'P_Event_Log',
 				'activation'    => 'P_Activation',

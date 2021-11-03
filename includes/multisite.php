@@ -105,7 +105,7 @@ class P_Multisite extends P_Core {
 
 			// Save login settings
 			case 'patchstack_login_settings_group':
-				$options = array( 'patchstack_mv_wp_login', 'patchstack_rename_wp_login', 'patchstack_block_bruteforce_ips', 'patchstack_anti_bruteforce_blocktime', 'patchstack_anti_bruteforce_attempts', 'patchstack_anti_bruteforce_minutes', 'patchstack_login_time_block', 'patchstack_login_time_start', 'patchstack_login_time_end', 'patchstack_login_2fa', 'patchstack_login_whitelist' );
+				$options = array( 'patchstack_block_bruteforce_ips', 'patchstack_anti_bruteforce_blocktime', 'patchstack_anti_bruteforce_attempts', 'patchstack_anti_bruteforce_minutes', 'patchstack_login_time_block', 'patchstack_login_time_start', 'patchstack_login_time_end', 'patchstack_login_2fa', 'patchstack_login_whitelist' );
 				$this->save_options( $options );
 				break;
 

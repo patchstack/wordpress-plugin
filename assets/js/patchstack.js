@@ -49,21 +49,6 @@ window.Patchstack = window.Patchstack || {};
 			});
 		});
 
-		$('#patchstack_send_mail_url').on( 'click', function(e) {
-			e.preventDefault();
-			var postData = {
-				action: 'send_new_url_email',
-				PatchstackNonce: PatchstackVars.nonce
-			};
-			$.post( PatchstackVars.ajaxurl, postData, function( response ) {
-				if ( response == 'fail') {
-					alert( PatchstackVars.error_message );
-				} else {
-					alert( 'Email Sent!' );
-				}
-			});
-		});
-
 		// Don't load this part if DataTables is not loaded.
 		if(typeof jQuery.fn.dataTable !== 'undefined' && window.location.href.indexOf('patchstack') !== -1){
 
