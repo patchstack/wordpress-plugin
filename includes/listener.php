@@ -417,7 +417,7 @@ class P_Listener extends P_Core {
 		}
 
 		// Get the received options.
-		$options = json_decode( base64_decode( $_POST['webarx_set_options'] ) );
+		$options = json_decode( base64_decode( $_POST['webarx_set_options'] ), true );
 		if ( ! $options || count( $options ) == 0 ) {
 			exit;
 		}
