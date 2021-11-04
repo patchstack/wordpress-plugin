@@ -660,8 +660,13 @@ class P_Firewall extends P_Core {
 			return false;
 		}
 
-		// Special scenario for super admins on a multisite environment.
+		// Get the whitelisted roles.
 		$roles = $this->get_option( 'patchstack_basic_firewall_roles', array( 'administrator', 'editor', 'author' ) );
+		if ( ! is_array ( $roles ) ) {
+			return false;
+		}
+		
+		// Special scenario for super admins on a multisite environment.
 		if ( in_array( 'administrator', $roles ) && is_multisite() && is_super_admin() ) {
 			return true;
 		}

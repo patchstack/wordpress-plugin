@@ -1093,8 +1093,24 @@ a.label:hover {
     display: none;
 }
 
+.patchstack-fullwidth {
+    width: 100% !important;
+}
+
 #patchstack-activate {
     margin-top: 42px;
+}
+
+.patchstack-license-button #patchstack-activate {
+    width: 49%;
+    float: left;
+}
+
+.patchstack-license-button .patchstack-activate {
+    width: 49%;
+    float: left;
+    margin-top: 42px;
+    margin-left: 2%;
 }
 
 .patchstack-activate.button-primary.focus,

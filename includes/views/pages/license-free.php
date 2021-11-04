@@ -62,8 +62,10 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 			</span>
 		</div>
 
-		<input type="submit" id="patchstack-activate" value="<?php echo __( 'Activate', 'patchstack' ); ?>" class="button-primary ps-b3" style="<?php echo $status ? 'display: none;' : ''; ?>" />
-		<a href="https://app.patchstack.com/dashboard" class="patchstack-activate button-primary ps-b4" style="<?php echo ! $status ? 'display: none;' : ''; ?>" target="_blank"><?php echo __( 'Go to App', 'patchstack' ); ?></a>
+		<div class="patchstack-license-button">
+			<input type="submit" id="patchstack-activate" value="<?php echo $status ? __( 'Save', 'patchstack' ) : __( 'Activate', 'patchstack' ); ?>" class="button-primary ps-b3 <?php echo ! $status ? 'patchstack-fullwidth' : ''; ?>" />
+			<a href="https://app.patchstack.com/dashboard" class="patchstack-activate button-primary ps-b4" style="<?php echo ! $status ? 'display: none;' : ''; ?>" target="_blank"><?php echo __( 'Go to App', 'patchstack' ); ?></a>
+		</div>
 
 		<div id="hiddenstatusbox" class="patchstackInfo patchstack-font blue">
 			<span class="label label-success" id="patchstack_license_key_result"></span>

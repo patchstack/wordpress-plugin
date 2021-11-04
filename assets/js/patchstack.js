@@ -42,7 +42,8 @@ window.Patchstack = window.Patchstack || {};
 					} else {
 						$( '.patchstack-license-status' ).text( 'Active' ).css( { color: '#B2D675' } );
 						$( '.patchstack-sub-type' ).text( 'Community (Free) ');
-						$( '.ps-b1, .ps-b3, .ps-p1' ).hide();
+						$( '.ps-b1, .ps-p1' ).hide();
+						$( '.ps-b3' ).removeClass('patchstack-fullwidth');
 						$( '.ps-b2, .ps-b4, .ps-p2' ).show();
 					}
 				}
