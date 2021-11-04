@@ -441,11 +441,23 @@ class P_Listener extends P_Core {
 		// Get all options and filter by the Patchstack prefix.
 		$options  = wp_load_alloptions();
 		$settings = array();
+		$found = array();
 		foreach ( $options as $slug => $value ) {
 			if ( strpos( $slug, 'patchstack_' ) !== false ) {
+				array_push( $found, $slug );
 				$settings[] = array(
 					'option_name'  => $slug,
-					'option_value' => $value,
+					'option_value' => $value
+				);
+			}
+		}
+
+		// Check for potential missing options and add them to the output.
+		foreach( array( 'patchstack_firewall_custom_rules' ) as $slug ) {
+			if ( ! isset ( $found[$slug] ) ) {
+				$settings[] = array(
+					'option_name'  => $slug,
+					'option_value' => $this->get_option( $slug, '' )
 				);
 			}
 		}

@@ -65,7 +65,8 @@ class P_Cron extends P_Core {
 	 */
 	public function schedule_events() {
 		// Random time throughout the day to make sure not all sites synchronize at the same time.
-		if ( ! get_option( 'patchstack_cron_offset' ) ) {
+		$crons = get_option( 'patchstack_cron_offset', false );
+		if ( ! $crons || ! isset ( $crons['patchstack_daily'] ) ) {
 			$crons = array(
 				'patchstack_daily'      => strtotime( 'today' ) + mt_rand( 0, 86399 ),
 				'patchstack_hourly'     => strtotime( 'today' ) + mt_rand( 0, 3600 ),
@@ -79,8 +80,6 @@ class P_Cron extends P_Core {
 			foreach ( array( 'patchstack_send_software_data', 'patchstack_send_hacker_logs', 'patchstack_post_firewall_rules', 'patchstack_post_firewall_htaccess_rules', 'patchstack_post_dynamic_firewall_rules', 'patchstack_update_license_status', 'patchstack_send_event_logs', 'patchstack_update_plugins', 'patchstack_send_ping' ) as $event ) {
 				wp_clear_scheduled_hook( $event );
 			}
-		} else {
-			$crons = get_option( 'patchstack_cron_offset' );
 		}
 
 		// List of the different events.
