@@ -425,7 +425,8 @@ class P_Listener extends P_Core {
 		// Loop through the options and update their value.
 		foreach ( $options as $key => $value ) {
 			if ( array_key_exists( $key, $this->plugin->admin_options->options ) ) {
-				update_option( $key, wp_filter_nohtml_kses( $value ) );
+				$value = map_deep($value, 'wp_filter_nohtml_kses');
+				update_option( $key, $value );
 			}
 		}
 
