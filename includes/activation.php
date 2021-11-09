@@ -249,7 +249,7 @@ class P_Activation extends P_Core {
 	 */
 	public function migrate_check() {
 		// Only perform migrations if we have any to execute.
-		$versions = array('3.0.0');
+		$versions = array('3.0.0', '3.0.1');
 		if ( count( $versions ) == 0 ) {
 			return;
 		}

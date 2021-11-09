@@ -77,7 +77,7 @@ class P_Upload extends P_Core {
 	 */
 	public function upload_firewall_logs() {
 		global $wpdb;
-		$lastid = get_option( 'patchstack_firewall_log_lastid', 0, true );
+		$lastid = get_option( 'patchstack_firewall_log_lastid', 0 );
 		$items  = $wpdb->get_results( $wpdb->prepare( 'SELECT ip, log_date, request_uri, user_agent, fid, method, post_data FROM ' . $wpdb->prefix . 'patchstack_firewall_log WHERE id > %d ORDER BY id', $lastid ) );
 
 		// No need to synchronize if there are no new logs present.
