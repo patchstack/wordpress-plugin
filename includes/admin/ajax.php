@@ -20,11 +20,14 @@ class P_Admin_Ajax extends P_Core {
 		parent::__construct( $core );
 		if ( isset( $_POST['PatchstackNonce'] ) && current_user_can( 'manage_options' ) && wp_verify_nonce( $_POST['PatchstackNonce'], 'patchstack-nonce' ) ) {
 			// Log tables actions.
-			add_action( 'wp_ajax_users_log_table', array( $this, 'users_log_table' ) );
-			add_action( 'wp_ajax_firewall_log_table', array( $this, 'firewall_log_table' ) );
+			add_action( 'wp_ajax_patchstack_users_log_table', array( $this, 'users_log_table' ) );
+			add_action( 'wp_ajax_patchstack_firewall_log_table', array( $this, 'firewall_log_table' ) );
 
 			// License related actions.
-			add_action( 'wp_ajax_activate_license', array( $this, 'activate_license' ) );
+			add_action( 'wp_ajax_patchstack_activate_license', array( $this, 'activate_license' ) );
+
+			// Hide login related actions.
+			add_action( 'wp_ajax_patchstack_send_new_url_email', array( $this, 'send_new_url_email' ) );
 		}
 	}
 
@@ -154,7 +157,12 @@ class P_Admin_Ajax extends P_Core {
 	 */
 	public function activate_license() {
 		if ( ! isset( $_POST['clientid'], $_POST['secretkey'] ) || !ctype_digit( $_POST['clientid'] ) ) {
-			return;
+			wp_send_json(
+				array( 
+					'result' => 'error',
+					'error_message' => 'Fill in all of the fields properly.'
+				)
+			);
 		}
 
 		// Test the new keys.
@@ -165,5 +173,18 @@ class P_Admin_Ajax extends P_Core {
 			$results['response'] = $response;
 			wp_send_json( $results );
 		}
+	}
+
+	/**
+	 * Send an email to the current logged in user that contains the new admin page URL.
+	 *
+	 * @return void
+	 */
+	public function send_new_url_email() {
+		global $current_user;
+		$subject = __( 'New Login URL', 'patchstack' );
+		$message = '<br /><br />Your login page is now  here: <strong> <a href="' . get_site_url() . '/' . get_site_option( 'patchstack_rename_wp_login' ) . '">' . get_site_url() . '/' . get_site_option( 'patchstack_rename_wp_login' ) . '</strong></a>';
+		$email_sent = wp_mail( $current_user->user_email, $subject, $message );
+		die( $email_sent ? 'success' : 'fail' );
 	}
 }

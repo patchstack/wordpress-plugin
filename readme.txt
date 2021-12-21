@@ -5,7 +5,7 @@ License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Requires at least: 4.4
 Tested up to: 5.8
-Stable tag: 2.1.12
+Stable tag: 2.1.13
 Requires PHP: 5.6
 
 Patchstack identifies security vulnerabilities in WordPress plugins, themes, and core.
@@ -15,6 +15,8 @@ Patchstack identifies security vulnerabilities in WordPress plugins, themes, and
 Patchstack is a powerful tool that helps to identify security vulnerabilities within all your websites plugins, themes, and core.
 Patchstack is powered by the most active community of ethical hackers in the WordPress ecosystem.
 Patchstack is trusted by the leading WordPress experts such as: Pagely, Cloudways, GridPane, Plesk and others!
+
+https://www.youtube.com/watch?v=LL3Yy15rJ3g
 
 ### Why do I need Patchstack Community (*Free) version?*
 * Be the first to know about new vulnerabilities!
@@ -161,7 +163,7 @@ You can join the Patchstack Facebook community here: [https://www.facebook.com/g
 Join Patchstack vulnerability newsletter here: [https://mailchi.mp/patchstack/newsletter](https://mailchi.mp/patchstack/newsletter)
 
 = I developed a WordPress plugin - how can I get it security audited by Patchstack? =
-See more about Patchstack security audits here: [https://patchstack.com/security-audits](https://patchstack.com/security-audits/)
+See more about Patchstack security audits here: [https://patchstack.com/solutions/#auditing](https://patchstack.com/solutions/#auditing)
 
 == Screenshots ==
 

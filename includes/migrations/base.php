@@ -238,4 +238,6 @@ if ( ! $result ) {
 	}
 }
 
+update_option( 'patchstack_firewall_log_lastid', 0 );
+update_option( 'patchstack_eventlog_lastid', 0 );
 add_option( 'patchstack_db_version', $this->plugin->version );

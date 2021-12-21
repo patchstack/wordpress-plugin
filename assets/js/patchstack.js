@@ -22,7 +22,7 @@ window.Patchstack = window.Patchstack || {};
 		$('input#patchstack-activate').on( 'click', function(e) {
 			e.preventDefault();
 			var postData = {
-				action: 'activate_license',
+				action: 'patchstack_activate_license',
 				clientid: $( '#patchstack_api_client_id' ).val(),
 				secretkey: $( '#patchstack_api_client_secret_key' ).val(),
 				PatchstackNonce: PatchstackVars.nonce
@@ -35,7 +35,11 @@ window.Patchstack = window.Patchstack || {};
 
 			$.post( PatchstackVars.ajaxurl, postData, function( response ) {
 				if ( response.result == 'error' ) {
-					alert( PatchstackVars.error_message );
+					if ( response.error_message ) {
+						alert( response.error_message );
+					} else {
+						alert( PatchstackVars.error_message );
+					}
 				} else {
 					if (response.response && response.response.free === false) {
 						window.location.reload();
@@ -46,6 +50,21 @@ window.Patchstack = window.Patchstack || {};
 						$( '.ps-b3' ).removeClass('patchstack-fullwidth');
 						$( '.ps-b2, .ps-b4, .ps-p2' ).show();
 					}
+				}
+			});
+		});
+
+		$('#patchstack_send_mail_url').on( 'click', function(e) {
+			e.preventDefault();
+			var postData = {
+				action: 'patchstack_send_new_url_email',
+				PatchstackNonce: PatchstackVars.nonce
+			};
+			$.post( PatchstackVars.ajaxurl, postData, function( response ) {
+				if ( response == 'fail') {
+					alert( PatchstackVars.error_message );
+				} else {
+					alert( 'Email Sent!' );
 				}
 			});
 		});
@@ -61,7 +80,7 @@ window.Patchstack = window.Patchstack || {};
 					"url": PatchstackVars.ajaxurl,
 					"type": "POST",
 					"data": function(d){
-						d.action = 'firewall_log_table';
+						d.action = 'patchstack_firewall_log_table';
 						d.PatchstackNonce = $("meta[name=patchstack_nonce]").attr("value");
 					}
 				},
@@ -105,7 +124,7 @@ window.Patchstack = window.Patchstack || {};
 					"url": PatchstackVars.ajaxurl,
 					"type": "POST",
 					"data": function(d){
-						d.action = 'users_log_table';
+						d.action = 'patchstack_users_log_table';
 						d.PatchstackNonce = $("meta[name=patchstack_nonce]").attr("value");
 					}
 				},

@@ -3,7 +3,7 @@
  * Plugin Name: Patchstack Security
  * Plugin URI:  https://patchstack.com
  * Description: Patchstack identifies security vulnerabilities in WordPress plugins, themes, and core.
- * Version: 2.1.12
+ * Version: 2.1.13
  * Author: Patchstack
  * License: GPLv3
  * Text Domain: patchstack
@@ -58,7 +58,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 		 *
 		 * @var string
 		 */
-		const VERSION = '2.1.12';
+		const VERSION = '2.1.13';
 
 		/**
 		 * API URL of Patchstack to communicate with.
@@ -87,13 +87,6 @@ if ( ! class_exists( 'patchstack' ) ) {
 		 * @var string
 		 */
 		const PRIVATE_KEY = 'PATCHSTACK_PRIVATE_KEY';
-
-		/**
-		 * Known IP addresses.
-		 *
-		 * @var array
-		 */
-		protected $ips = array( '18.221.197.243', '52.15.237.250', '3.19.3.34', '3.18.238.17', '13.58.49.77', '18.222.191.77', '3.131.108.250', '3.23.157.140', '18.220.70.233', '3.140.84.221', '185.212.171.100' );
 
 		/**
 		 * URL of the plugin directory.
@@ -146,6 +139,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 		protected $hacker_log;
 		protected $upload;
 		protected $rules;
+		protected $hide_login;
 		protected $listener;
 		protected $event_log;
 		protected $multisite;
@@ -196,6 +190,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 				'hacker_log'    => 'P_Hacker_Log',
 				'upload'        => 'P_Upload',
 				'rules'         => 'P_Rules',
+				'hide_login'    => 'P_Hide_Login',
 				'listener'      => 'P_Listener',
 				'event_log'     => 'P_Event_Log',
 				'activation'    => 'P_Activation',

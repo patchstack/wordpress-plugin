@@ -84,10 +84,10 @@ class P_Cron extends P_Core {
 
 		// List of the different events.
 		$free = array(
-			'patchstack_send_software_data'    => 'patchstack_hourly',
+			'patchstack_send_software_data'    => 'patchstack_twicedaily',
 			'patchstack_update_license_status' => 'patchstack_twicedaily',
 			'patchstack_send_ping'             => 'patchstack_trihourly',
-			'patchstack_update_plugins'        => 'patchstack_15minute',
+			'patchstack_update_plugins'        => 'patchstack_15minute'
 		);
 
 		$premium = array(
@@ -95,7 +95,7 @@ class P_Cron extends P_Core {
 			'patchstack_post_firewall_rules'          => 'patchstack_twicedaily',
 			'patchstack_post_firewall_htaccess_rules' => 'patchstack_trihourly',
 			'patchstack_post_dynamic_firewall_rules'  => 'patchstack_hourly',
-			'patchstack_send_event_logs'              => 'patchstack_15minute',
+			'patchstack_send_event_logs'              => 'patchstack_15minute'
 		);
 
 		// Schedule the events if they are not scheduled yet.

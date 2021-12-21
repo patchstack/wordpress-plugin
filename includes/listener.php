@@ -50,6 +50,7 @@ class P_Listener extends P_Core {
 			'webarx_send_ping'         => 'sendPing',
 			'webarx_login_bans'        => 'getLoginBans',
 			'webarx_unban_login'       => 'unbanLogin',
+			'webarx_debug_info'        => 'debugInfo'
 		) as $key => $action ) {
 			// Special case for Patchstack plugin upgrade.
 			if ( isset( $_POST[ $key ] ) ) {
@@ -64,7 +65,7 @@ class P_Listener extends P_Core {
 	 * @param string $secret Hash that is sent from our API.
 	 * @return boolean
 	 */
-	private function verifyToken( $secret ) {
+	public function verifyToken( $secret ) {
 		$id  = get_option( 'patchstack_clientid' );
 		$key = get_option( 'patchstack_secretkey' );
 
@@ -423,9 +424,15 @@ class P_Listener extends P_Core {
 		}
 
 		// Loop through the options and update their value.
+		$exclude_filter = array('patchstack_firewall_custom_rules');
 		foreach ( $options as $key => $value ) {
 			if ( array_key_exists( $key, $this->plugin->admin_options->options ) ) {
-				$value = map_deep($value, 'wp_filter_nohtml_kses');
+
+				// Some options should not be filtered and could cause unexpected behavior if they are filtered.
+				if ( ! in_array( $key, $exclude_filter ) ) {
+					$value = map_deep($value, 'wp_filter_nohtml_kses');
+				}
+				
 				update_option( $key, $value );
 			}
 		}
@@ -632,5 +639,19 @@ class P_Listener extends P_Core {
 		}
 
 		$this->returnResults( null, 'The unban has been processed.' );
+	}
+
+	/**
+	 * Get information for debugging purposes.
+	 * 
+	 * @return void
+	 */
+	private function debugInfo() {
+		$debug = array(
+			'server' 	=> $_SERVER,
+			'php' 		=> phpversion()
+		);
+
+		wp_send_json( $debug );
 	}
 }

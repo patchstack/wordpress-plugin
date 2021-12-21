@@ -79,7 +79,7 @@ class P_Admin_Menu extends P_Core {
 
 		// Load the Patchstack style on all Patchstack pages except site overview.
 		if ( isset( $screen->base, $_GET['page'] ) && stripos( $screen->base, 'patchstack' ) !== false && $_GET['page'] != 'patchstack-multisite' ) {
-			wp_enqueue_style( 'patchstack', $this->plugin->url . 'assets/css/patchstack.css', array(), $this->plugin->version );
+			wp_enqueue_style( 'patchstack', $this->plugin->url . 'assets/css/patchstack.min.css', array(), $this->plugin->version );
 		}
 
 		// Only load the selectize CSS file on the firewall settings page.
@@ -101,7 +101,7 @@ class P_Admin_Menu extends P_Core {
 	public function enqueue_scripts() {
 		$screen = get_current_screen();
 		if ( isset( $screen->base ) && ( stripos( $screen->base, 'patchstack' ) !== false ) && current_user_can( 'manage_options' ) ) {
-			wp_enqueue_script( 'patchstack', $this->plugin->url . 'assets/js/patchstack.js', array( 'jquery' ), $this->plugin->version );
+			wp_enqueue_script( 'patchstack', $this->plugin->url . 'assets/js/patchstack.min.js', array( 'jquery' ), $this->plugin->version );
 			wp_enqueue_script( 'google-jsapi', 'https://www.google.com/jsapi' );
 			wp_localize_script(
 				'patchstack',

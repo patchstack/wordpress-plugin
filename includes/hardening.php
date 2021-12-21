@@ -153,7 +153,7 @@ class P_Hardening extends P_Core {
 		$ip        = $this->get_ip();
 
 		// Don't block Patchstack.
-		if ( in_array( $ip, $this->plugin->ips ) ) {
+		if ( isset( $_POST['webarx_secret'] ) && $this->plugin->listener->verifyToken( $_POST['webarx_secret'] ) ) {
 			return;
 		}
 
@@ -280,7 +280,7 @@ class P_Hardening extends P_Core {
 			);
 		}
 
-		$response = $this->plugin->hardening->get_captcha_response( $secret_key );
+		$response = $this->get_captcha_response( $secret_key );
 		if ( isset( $response['success'] ) && ! empty( $response['success'] ) ) {
 			return array(
 				'response' => true,

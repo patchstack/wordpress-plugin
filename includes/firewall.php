@@ -693,7 +693,7 @@ class P_Firewall extends P_Core {
 	 */
 	private function log_hacker( $fid = 1, $post_data = '', $block_type = 'BLOCK' ) {
 		global $wpdb;
-		if ( ! $wpdb || $fid == 22 ) {
+		if ( ! $wpdb || $fid == 22 || $fid == 23 ) {
 			return;
 		}
 
@@ -733,14 +733,20 @@ class P_Firewall extends P_Core {
 	 * @return void
 	 */
 	public function display_error_page( $fid = 1 ) {
-		if ( $fid != 22 ) {
+		if ( $fid != 22 && $fid != 23 && $fid != 'login' ) {
 			$this->log_hacker( $fid );
 		}
 
 		header( 'Cache-Control: no-store' );
 		header( 'Pragma: no-cache' );
 		http_response_code( 403 );
-		require_once dirname( __FILE__ ) . '/views/access-denied.php';
+
+		if ($fid == 'login' ) {
+			require_once dirname( __FILE__ ) . '/views/access-denied-login.php';
+		} else {
+			require_once dirname( __FILE__ ) . '/views/access-denied.php';
+		}
+		
 		exit;
 	}
 }

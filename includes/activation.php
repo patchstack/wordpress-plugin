@@ -30,6 +30,10 @@ class P_Activation extends P_Core {
 	 * @return void
 	 */
 	public function redirect_activation( $plugin, $network_activation ) {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			return;
+		}
+		
 		if ( $plugin == $this->plugin->basename ) {
 
 			// In case of multisite, we want to redirect the user to a different page.
