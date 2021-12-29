@@ -115,13 +115,20 @@ class P_Hide_Login extends P_Core {
 		// If the IP address is already whitelisted, reset the timestamp.
 		if ( is_array( $whitelist ) && count( $whitelist ) != 0 ) {
 			$ip = $this->get_ip();
+			$whitelisted = false;
 			foreach ( $whitelist as $entry ) {
-				// Determine if the IP address matches.
+				// Determine if we should extend the whitelist time or ignore if already whitelisted.
 				if ( $ip === $entry[0] ) {
 					$new_whitelist[] = array( $ip, time() );
+					$whitelisted = true;
 				} else {
 					$new_whitelist[] = $entry;
 				}
+			}
+
+			// Whitelist the IP address.
+			if ( ! $whitelisted ) {
+				$new_whitelist[] = array( $ip, time() );
 			}
 
 			update_site_option( 'patchstack_rename_wp_login_whitelist', $new_whitelist );
