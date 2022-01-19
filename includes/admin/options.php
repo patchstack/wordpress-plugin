@@ -59,7 +59,6 @@ class P_Admin_Options extends P_Core {
 		// The firewall and whitelist rules.
 		'patchstack_firewall_rules'                     => '',
 		'patchstack_whitelist_rules'                    => '',
-		'patchstack_custom_whitelist_rules'             => '',
 		'patchstack_whitelist_keys_rules'               => '',
 
 		// Firewall options.
@@ -170,6 +169,7 @@ class P_Admin_Options extends P_Core {
 			add_settings_field( 'patchstack_auto_update', __( 'Auto Update Software', 'patchstack' ), array( $this, 'patchstack_auto_update_input' ), 'patchstack_hardening_settings', 'patchstack_settings_section_hardening' );
 		}
 		add_settings_field( 'patchstack_basicscanblock', __( 'Stop readme.txt Scans', 'patchstack' ), array( $this, 'patchstack_basicscanblock_input' ), 'patchstack_hardening_settings', 'patchstack_settings_section_hardening' );
+		add_settings_field( 'patchstack_pluginedit', __( 'Disable theme editor', 'patchstack' ), array( $this, 'patchstack_pluginedit_input' ), 'patchstack_hardening_settings', 'patchstack_settings_section_hardening' );
 		add_settings_field( 'patchstack_userenum', __( 'Disable user enumeration', 'patchstack' ), array( $this, 'patchstack_userenum_input' ), 'patchstack_hardening_settings', 'patchstack_settings_section_hardening' );
 		add_settings_field( 'patchstack_hidewpversion', __( 'Hide WordPress version', 'patchstack' ), array( $this, 'patchstack_hidewpversion_input' ), 'patchstack_hardening_settings', 'patchstack_settings_section_hardening' );
 		add_settings_field( 'patchstack_activity_log_is_enabled', __( 'Enable activity log', 'patchstack' ), array( $this, 'patchstack_activity_log_input' ), 'patchstack_hardening_settings', 'patchstack_settings_section_hardening' );
@@ -317,7 +317,7 @@ class P_Admin_Options extends P_Core {
 	}
 
 	public function patchstack_activity_log_input() {
-		$string1 = __( 'If enabled, every user action will be recorded and put to activity logs', 'patchstack' );
+		$string1 = __( 'If enabled, a large number of user related activities will be logged.', 'patchstack' );
 		echo wp_kses(  '<input type="checkbox" name="patchstack_activity_log_is_enabled" id="patchstack_activity_log_is_enabled" value="1" ' . checked( 1, $this->get_option( 'patchstack_activity_log_is_enabled' ), false ) . '/><label for="patchstack_activity_log_is_enabled"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 
@@ -410,7 +410,7 @@ class P_Admin_Options extends P_Core {
 	}
 
 	public function patchstack_pluginedit_input() {
-		$string1 = __( 'Disable direct editing of themes or plugins code from WordPress admin view.', 'patchstack' );
+		$string1 = __( 'Disable the theme editor. This could protect you from potential automated attacks that involve the theme editor.', 'patchstack' );
 		echo wp_kses( '<input type="checkbox" name="patchstack_pluginedit" id="patchstack_pluginedit" value="1" ' . checked( 1, $this->get_option( 'patchstack_pluginedit' ), false ) . '/><label for="patchstack_pluginedit"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 
@@ -420,23 +420,17 @@ class P_Admin_Options extends P_Core {
 	}
 
 	public function patchstack_basicscanblock_input() {
-		$string1 = __( 'This will attempt to stop basic readme.txt scans. These scans are generally used to determine the version of the installed software on the site.', 'patchstack' );
+		$string1 = __( 'This will attempt to stop basic readme.txt scans. These scans are generally used to determine the version of installed plugins on the site.', 'patchstack' );
 		echo wp_kses( '<input type="checkbox" name="patchstack_basicscanblock" id="patchstack_basicscanblock" value="1" ' . checked( 1, $this->get_option( 'patchstack_basicscanblock' ), false ) . '/><label for="patchstack_basicscanblock"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 
 	public function patchstack_userenum_input() {
-		$string1 = __( 'Disable user enumeration to block hackers from getting your usernames.', 'patchstack' );
+		$string1 = __( 'Make it harder for malicious people to find your WordPress username.', 'patchstack' );
 		echo wp_kses( '<input type="checkbox" name="patchstack_userenum" id="patchstack_userenum" value="1" ' . checked( 1, $this->get_option( 'patchstack_userenum' ), false ) . '/><label for="patchstack_userenum"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 
-	public function patchstack_hidewpcontent_input() {
-		$string1 = __( 'Move wp-content folder into facebook.com folder and link to it in wp-config.php. saving settings after ticking this will take more time than usual. Just let it reload the page on its own and be patient.', 'patchstack' );
-		$string2 = __( 'If this setting brakes your website then go to your server files through FTP, rename facebook.com folder to wp-content and erase Patchstack section from the top of wp-config.php file.', 'patchstack' );
-		echo wp_kses( '<input type="checkbox" name="patchstack_hidewpcontent" id="patchstack_hidewpcontent" value="1" ' . checked( 1, $this->get_option( 'patchstack_hidewpcontent' ), false ) . '/><label for="patchstack_hidewpcontent"><i>' . $string1 . '</i></br><span style="color: red; font-weight: bold">' . $string2 . '</span></label>' , $this->allowed_html );
-	}
-
 	public function patchstack_hidewpversion_input() {
-		$string1 = __( 'Removes the WordPress version in the <meta> tag in the HTML output.', 'patchstack' );
+		$string1 = __( 'Removes the WordPress version in the meta tag in the HTML output.', 'patchstack' );
 		echo wp_kses( '<input type="checkbox" name="patchstack_hidewpversion" id="patchstack_hidewpversion" value="1" ' . checked( 1, $this->get_option( 'patchstack_hidewpversion' ), false ) . '/><label for="patchstack_hidewpversion"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 
@@ -446,7 +440,7 @@ class P_Admin_Options extends P_Core {
 	}
 
 	public function patchstack_prevent_default_file_access_input() {
-		$string1 = __( 'Prevent access to such files as license.txt, readme.html and wp-config-sample.php', 'patchstack' );
+		$string1 = __( 'Prevent direct access to files such as license.txt, readme.html and wp-config.php', 'patchstack' );
 		echo wp_kses( '<input type="checkbox" name="patchstack_prevent_default_file_access" id="patchstack_prevent_default_file_access" value="1" ' . checked( 1, $this->get_option( 'patchstack_prevent_default_file_access' ), false ) . '/><label for="patchstack_prevent_default_file_access"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 

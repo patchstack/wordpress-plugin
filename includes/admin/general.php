@@ -88,9 +88,6 @@ class P_Admin_General extends P_Core {
 			if ( ! empty( $token ) ) {
 				$this->plugin->api->update_firewall_status( array( 'status' => $this->get_option( 'patchstack_basic_firewall' ) == 1 ) );
 			}
-
-			// Update the custom whitelist.
-			update_option( 'patchstack_custom_whitelist_rules', $this->get_option( 'patchstack_whitelist' ) );
 		}
 	}
 

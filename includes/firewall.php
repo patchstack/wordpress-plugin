@@ -45,7 +45,7 @@ class P_Firewall extends P_Core {
 	 * @return boolean
 	 */
 	private function is_custom_whitelisted() {
-		$whitelist = str_replace( '<?php exit; ?>', '', get_option( 'patchstack_custom_whitelist_rules', '' ) );
+		$whitelist = str_replace( '<?php exit; ?>', '', get_option( 'patchstack_whitelist', '' ) );
 		if ( empty( $whitelist ) ) {
 			return false;
 		}
