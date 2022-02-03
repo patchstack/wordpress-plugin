@@ -202,7 +202,7 @@ class P_Firewall extends P_Core {
 	 * @return array
 	 */
 	private function get_file_upload_data() {
-		if ( ! is_array( $_FILES ) || count( $_FILES ) == 0 ) {
+		if ( ! isset( $_FILES ) || ! is_array( $_FILES ) || count( $_FILES ) == 0 ) {
 			return '';
 		}
 
@@ -237,8 +237,8 @@ class P_Firewall extends P_Core {
 		$data = $this->capture_keys();
 
 		// Get the method and URL.
-		$method   = $_SERVER['REQUEST_METHOD'];
-		$rulesUri = $_SERVER['REQUEST_URI'];
+		$method   = isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+		$rulesUri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
 
 		// Store the header values in different formats.
 		$rulesHeadersKeys         = array();
@@ -321,8 +321,8 @@ class P_Firewall extends P_Core {
 	private function capture_keys() {
 		// Data we want to go through.
 		$data = array(
-			'POST' => $_POST,
-			'GET'  => $_GET,
+			'POST' => isset( $_POST ) ? $_POST : array(),
+			'GET'  => isset( $_GET ) ? $_GET : array(),
 		);
 
 		// Determine if there are any keys we should remove from the data set.
