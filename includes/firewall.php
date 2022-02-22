@@ -737,9 +737,9 @@ class P_Firewall extends P_Core {
 			$this->log_hacker( $fid );
 		}
 
-		header( 'Cache-Control: no-store' );
-		header( 'Pragma: no-cache' );
-		http_response_code( 403 );
+		status_header(403);
+		send_nosniff_header();
+		nocache_headers();
 
 		if ($fid == 'login' ) {
 			require_once dirname( __FILE__ ) . '/views/access-denied-login.php';
