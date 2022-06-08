@@ -153,7 +153,7 @@ class P_Hardening extends P_Core {
 		$ip        = $this->get_ip();
 
 		// Don't block Patchstack.
-		if ( isset( $_POST['webarx_secret'] ) && $this->plugin->listener->verifyToken( $_POST['webarx_secret'] ) ) {
+		if ( in_array( $_SERVER['REMOTE_ADDR'], $this->ips ) || ( isset( $_POST['webarx_secret'] ) && $this->plugin->listener->verifyToken( $_POST['webarx_secret'] ) ) ) {
 			return;
 		}
 

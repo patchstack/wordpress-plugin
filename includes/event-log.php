@@ -46,6 +46,11 @@ class P_Event_Log extends P_Core {
 		$user   = get_user_by( 'id', get_current_user_id() );
 		$author = ! $user ? 'Unauthenticated user' : $user->data->user_login;
 
+		// If it's a scheduled task running, we override the name.
+		if ( defined( 'DOING_CRON' ) && DOING_CRON ) {
+			$author = 'WPCron';
+		}
+
 		// Exception for when the action is 'logged in'.
 		if ( $args['action'] == 'logged in' ) {
 			$author = $args['object_name'];

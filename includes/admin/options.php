@@ -121,6 +121,8 @@ class P_Admin_Options extends P_Core {
 		'patchstack_api_token'                          => '',
 		'patchstack_whitelist'                          => '',
 		'patchstack_show_settings'                      => 0,
+		'patchstack_firewall_log_lastid'                => 0,
+		'patchstack_eventlog_lastid'                    => 0,
 
 		// Admin page rename options.
 		'patchstack_mv_wp_login'                        => 0,
@@ -532,19 +534,19 @@ class P_Admin_Options extends P_Core {
 		} else {
 			$nonce = wp_create_nonce( 'patchstack-nonce-alter-ips' );
 			foreach ( $results as $result ) {
-				$rows .= '<tr><td>' . esc_html( $result->ip ) . '</td><td>' . ( isset( $result->log_date ) ? $result->log_date : $result->date ) . '</td><td><a href="' . add_query_arg(
+				$rows .= '<tr><td>' . esc_html( $result->ip ) . '</td><td>' . ( isset( $result->log_date ) ? $result->log_date : $result->date ) . '</td><td><a href="' . esc_url( add_query_arg(
 					array(
 						'PatchstackNonce' => $nonce,
 						'action'          => 'patchstack_unblock',
 						'id'              => $result->id,
 					)
-				) . '">Unblock</a></td><td><a href="' . add_query_arg(
+				) ) . '">Unblock</a></td><td><a href="' . esc_url( add_query_arg(
 					array(
 						'PatchstackNonce' => $nonce,
 						'action'          => 'patchstack_unblock_whitelist',
 						'id'              => $result->id,
 					)
-				) . '">Unblock &amp; Whitelist</a></td></tr>';
+				) ) . '">Unblock &amp; Whitelist</a></td></tr>';
 			}
 		}
 
