@@ -33,6 +33,7 @@ class P_Upload extends P_Core {
 		// In case a plugin or upgrade has been performed, re-synchronize with the app.
 		add_action( 'activated_plugin', array( $this, 'upload_software' ) );
 		add_action( 'deactivated_plugin', array( $this, 'upload_software' ) );
+		add_action( 'deleted_plugin', array( $this, 'upload_software' ) );
 		add_action( 'upgrader_process_complete', array( $this, 'upload_software' ) );
 		add_action( '_core_updated_successfully', array( &$this, 'upload_software' ) );
 	}
@@ -47,7 +48,7 @@ class P_Upload extends P_Core {
 		// Get the software data and hash.
 		$data = $this->get_software_data();
 		$hash = sha1( json_encode( $data ) );
-		if ( ! defined( 'DOING_CRON' ) && ! isset( $_POST['webarx_secret'] ) && get_option( 'patchstack_software_data_hash', false ) === $hash ) {
+		if ( ! defined( 'DOING_CRON' ) && ! isset( $_POST['webarx_secret'] ) && get_option( 'patchstack_software_data_hash', false ) === $hash && ! is_admin() ) {
 			return;
 		}
 
@@ -200,13 +201,21 @@ class P_Upload extends P_Core {
 			$plugin_version = empty( $plugin_data['Version'] ) ? '' : $plugin_data['Version'];
 
 			if ( ! empty( $plugin_name ) && ! empty( $plugin_version ) ) {
+				
+				// Determine the active state.
+				if ( isset( $_GET['action'], $_GET['plugin'] ) && $_GET['action'] == 'deactivate' && $_GET['plugin'] == $plugin) {
+					$active = 0;
+				} else {
+					$active = (int) is_plugin_active( $plugin );
+				}
+
 				$software_list[] = array(
 					'sw_type'    => 'plugin',
 					'sw_name'    => $plugin_name,
 					'sw_cur_ver' => $plugin_version,
 					'sw_new_ver' => $new_version,
 					'sw_key'     => $plugin,
-					'sw_active'  => is_plugin_active( $plugin ),
+					'sw_active'  => $active
 				);
 			}
 		}
