@@ -86,9 +86,10 @@ class P_Admin_Options extends P_Core {
 		'patchstack_geo_block_countries'                => array(),
 
 		// Cookie notice options.
+		'patchstack_enable_cookie_notice_message'		=> 0,
 		'patchstack_cookie_notice_message'              => 'We use cookies for various purposes including analytics and personalized marketing. By continuing to use the service, you agree to our use of cookies.',
-		'patchstack_cookie_notice_backgroundcolor'      => '#222222',
-		'patchstack_cookie_notice_textcolor'            => '#ffffff',
+		'patchstack_cookie_notice_backgroundcolor'      => '222222',
+		'patchstack_cookie_notice_textcolor'            => 'ffffff',
 		'patchstack_cookie_notice_privacypolicy_enable' => 0,
 		'patchstack_cookie_notice_privacypolicy_text'   => 'Cookie Policy',
 		'patchstack_cookie_notice_privacypolicy_link'   => '#',

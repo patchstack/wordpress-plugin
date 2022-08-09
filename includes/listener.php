@@ -433,7 +433,7 @@ class P_Listener extends P_Core {
 					$value = map_deep($value, 'wp_filter_nohtml_kses');
 				}
 				
-				update_option( $key, $value );
+				update_option( $key, $value, true );
 			}
 		}
 
@@ -447,17 +447,13 @@ class P_Listener extends P_Core {
 	 */
 	private function getAvailableOptions() {
 		// Get all options and filter by the Patchstack prefix.
-		$options  = wp_load_alloptions();
+		global $wpdb;
+		$options  = $wpdb->get_results( "SELECT option_name, option_value FROM " . $wpdb->options . " WHERE option_name LIKE 'patchstack_%'" );
 		$settings = array();
 		$found = array();
-		foreach ( $options as $slug => $value ) {
-			if ( strpos( $slug, 'patchstack_' ) !== false ) {
-				array_push( $found, $slug );
-				$settings[] = array(
-					'option_name'  => $slug,
-					'option_value' => $value
-				);
-			}
+		foreach ( $options as $option ) {
+			array_push( $found, $option->option_name );
+			$settings[] = (array) $option;
 		}
 
 		// Check for potential missing options and add them to the output.
