@@ -5,7 +5,7 @@ License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Requires at least: 4.4
 Tested up to: 6.0
-Stable tag: 2.1.21
+Stable tag: 2.1.22
 Requires PHP: 5.6
 
 Patchstack identifies security vulnerabilities in WordPress plugins, themes, and core.
