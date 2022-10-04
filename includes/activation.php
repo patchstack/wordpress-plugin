@@ -253,7 +253,7 @@ class P_Activation extends P_Core {
 	 */
 	public function migrate_check() {
 		// Only perform migrations if we have any to execute.
-		$versions = array('3.0.0', '3.0.1');
+		$versions = array('3.0.0', '3.0.1', '3.0.2');
 		if ( count( $versions ) == 0 ) {
 			return;
 		}
@@ -329,6 +329,7 @@ class P_Activation extends P_Core {
 				if ( get_option( 'patchstack_license_free', 0 ) != 1 ) {
 					do_action( 'patchstack_post_firewall_rules' );
 					do_action( 'patchstack_post_dynamic_firewall_rules' );
+					$this->header();
 				}
 
 				$this->plugin->api->update_firewall_status( array( 'status' => $this->get_option( 'patchstack_basic_firewall' ) == 1 ) );
@@ -347,6 +348,43 @@ class P_Activation extends P_Core {
 			return array(
 				'result'  => 'success',
 				'message' => 'License deactivated!',
+			);
+		}
+	}
+
+	/**
+	 * Send a request to our API for the IP address header.
+	 * 
+	 * @return void
+	 */
+	public function header()
+	{
+		$header = get_option( 'patchstack_firewall_ip_header', '' );
+		$computed = get_option( 'patchstack_ip_header_computed', 0 );
+
+		if ( $header == '' && !$computed ) {
+			// Create an OTT token.
+			$ott = md5( wp_generate_password( 32, true, true ) );
+			update_option( 'patchstack_ott_action', $ott );
+	
+			// Tell our API.
+			wp_remote_request(
+				$this->plugin->api_url . '/api/header',
+				array(
+					'method'      => 'POST',
+					'timeout'     => 60,
+					'redirection' => 5,
+					'httpversion' => '1.0',
+					'blocking'    => true,
+					'headers'     => array(
+						'Source-Host'   => get_site_url(),
+					),
+					'body'        => array(
+						'token' => $ott,
+						'url' => get_site_url()
+					),
+					'cookies'     => array(),
+				)
 			);
 		}
 	}

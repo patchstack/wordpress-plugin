@@ -107,7 +107,10 @@ class P_Core {
 		'3.23.157.140',
 		'18.220.70.233',
 		'3.140.84.221',
-		'185.212.171.100'
+		'185.212.171.100',
+		'3.133.121.93',
+		'18.219.61.133',
+		'3.14.29.150'
 	);
 
 	/**
@@ -195,26 +198,6 @@ class P_Core {
 	}
 
 	/**
-	 * Determine if a given PHP function is disabled or not.
-	 *
-	 * @param string $name Name of the function to check.
-	 * @return boolean Whether or not the function is available to call.
-	 */
-	public function function_available( $name ) {
-		$safe_mode = ini_get( 'safe_mode' );
-		if ( $safe_mode && strtolower( $safe_mode ) != 'off' ) {
-			return false;
-		}
-
-		// Determine if the function is available.
-		if ( in_array( $name, array_map( 'trim', explode( ',', ini_get( 'disable_functions' ) ) ) ) ) {
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
 	 * Attempt to get the client IP by checking all possible IP (proxy) headers.
 	 *
 	 * @return string
@@ -226,37 +209,6 @@ class P_Core {
 			return $_SERVER[ $override ];
 		}
 
-		// IP address headers which should have priority and be used regardless of other headers.
-		$priority = array( 'HTTP_CF_CONNECTING_IP', 'HTTP_X_SUCURI_CLIENTIP' );
-		foreach ( $priority as $header ) {
-			if ( isset( $_SERVER[ $header ] ) && filter_var( $_SERVER[ $header ], FILTER_VALIDATE_IP ) !== false ) {
-				return $_SERVER[ $header ];
-			}
-		}
-
-		// Special case for hosts that have a weird configuration.
-		if ( $this->function_available( 'php_uname' ) ) {
-			$uname = @php_uname();
-
-			// Bluehos and Hostmonster store the real IP in $_SERVER['REMOTE_ADDR'] but the proxy IP in HTTP_X_FORWARDED_FOR.t
-			if ( strpos( $uname, 'bluehost' ) !== false || strpos( $uname, 'hostmonster' ) !== false ) {
-				return $_SERVER['REMOTE_ADDR'];
-			}
-
-			// Hostgator stores the real IP in $_SERVER['REMOTE_ADDR'] but the proxy IP in HTTP_X_FORWARDED_FOR.
-			if ( ( strpos( $uname, 'websitewelcome' ) || strpos( $uname, 'hostgator' ) ) && isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) && $_SERVER['HTTP_X_FORWARDED_FOR'] != $_SERVER['REMOTE_ADDR'] ) {
-				return $_SERVER['REMOTE_ADDR'];
-			}
-		}
-
-		// In order of priority, try to get the IP address.
-		$allowed = array( 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'SUCURI_RIP', 'REMOTE_ADDR' );
-		foreach ( $allowed as $header ) {
-			if ( isset( $_SERVER[ $header ] ) && filter_var( $_SERVER[ $header ], FILTER_VALIDATE_IP ) !== false ) {
-				return $_SERVER[ $header ];
-			}
-		}
-
-		return '127.0.0.1';
+		return isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
 	}
 }

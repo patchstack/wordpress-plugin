@@ -11,9 +11,14 @@ $active_tab    = isset( $_GET['tab'] ) && in_array( $_GET['tab'], $tabs ) ? esc_
 $activated     = ( ( isset( $_GET['activated'] ) && $_GET['activated'] == 1 ) || ( isset( $_GET['active'] ) && $_GET['active'] == 1 ) );
 $status        = ( get_option( 'patchstack_license_expiry', '' ) == '' || time() >= strtotime( get_option( 'patchstack_license_expiry', '' ) ) );
 $show_settings = $this->get_option( 'patchstack_show_settings', 0 ) == 1;
+$is_free = $this->get_option( 'patchstack_license_free', 0 ) == 1;
 
 if ( ( ! $show_settings && $_GET['page'] != 'patchstack-multisite-settings' ) || ( $status && $active_tab != 'license' && $_GET['page'] != 'patchstack-multisite-settings' ) ) {
 	$_GET['tab'] = $active_tab = 'license';
+}
+
+if ( ( $is_free || !$is_free && $status) && $active_tab != 'license' && $_GET['page'] == 'patchstack-multisite-settings' ) {
+	$_GET['tab'] = $active_tab = 'multisite';
 }
 
 // Determine the URL's.
@@ -33,7 +38,7 @@ $page = $_GET['page'] == 'patchstack-multisite-settings' ? 'patchstack-multisite
 		<?php
 		if ( $_GET['page'] != 'patchstack-multisite-settings' && $show_settings && is_multisite() ) {
 			$site_info = get_blog_details();
-			echo "<h2 style='color:white;padding-left: 95px; margin-left: 95px;padding-top: 4px;'>" . esc_html( $site_info->domain ) . '</h2>';
+			echo "<h2 style='color:white;padding-left: 95px; margin-top: -12px; margin-left: 150px;'>" . esc_html( $site_info->domain ) . '</h2>';
 		}
 		?>
 	</div>

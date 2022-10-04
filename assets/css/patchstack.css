@@ -1143,3 +1143,11 @@ p.patchstack-upsell img {
     width: 500px;
     margin-left: -90px;
 }
+
+.patchstack-active-tab-multisite {
+    max-width: 35rem !important;
+}
+
+.multisite .patchstack-active-tab-hardening {
+    max-width: 35rem !important;
+}

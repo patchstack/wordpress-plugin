@@ -65,6 +65,7 @@ class P_Admin_Options extends P_Core {
 		'patchstack_basic_firewall'                     => 1,
 		'patchstack_basic_firewall_roles'               => array( 'administrator', 'editor', 'author', 'contributor' ),
 		'patchstack_firewall_ip_header'                 => '',
+		'patchstack_ip_header_computed'					=> 0,
 		'patchstack_disable_htaccess'                   => 0,
 		'patchstack_known_blacklist'                    => 0,
 		'patchstack_block_debug_log_access'             => 1,
@@ -124,6 +125,7 @@ class P_Admin_Options extends P_Core {
 		'patchstack_show_settings'                      => 0,
 		'patchstack_firewall_log_lastid'                => 0,
 		'patchstack_eventlog_lastid'                    => 0,
+		'patchstack_ott_action'							=> '',
 
 		// Admin page rename options.
 		'patchstack_mv_wp_login'                        => 0,
@@ -198,8 +200,9 @@ class P_Admin_Options extends P_Core {
 		add_settings_field( 'patchstack_basic_firewall_geo_enabled', __( 'Country Blocking Enabled', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_enabled_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
 		add_settings_field( 'patchstack_basic_firewall_geo_inverse', __( 'Inversed Check', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_inverse_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
 		add_settings_field( 'patchstack_basic_firewall_geo_countries', __( 'Countries To Block', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_countries_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
+		add_settings_field( 'patchstack_firewall_ip_header', __( 'IP Address Header Override', 'patchstack' ), array( $this, 'patchstack_firewall_ip_header_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall' );
+
 		if ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) {
-			add_settings_field( 'patchstack_firewall_ip_header', __( 'IP Address Header Override', 'patchstack' ), array( $this, 'patchstack_firewall_ip_header_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall' );
 			add_settings_field( 'patchstack_disable_htaccess', __( 'Disable .htaccess features', 'patchstack' ), array( $this, 'patchstack_disable_htaccess_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_htaccess' );
 			add_settings_field( 'patchstack_add_security_headers', __( 'Add security headers', 'patchstack' ), array( $this, 'patchstack_add_security_headers_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_htaccess' );
 			add_settings_field( 'patchstack_prevent_default_file_access', __( 'Prevent default WordPress file access', 'patchstack' ), array( $this, 'patchstack_prevent_default_file_access_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_htaccess' );
@@ -214,7 +217,7 @@ class P_Admin_Options extends P_Core {
 		add_settings_field( 'patchstack_whitelist', __( 'Whitelist', 'patchstack' ), array( $this, 'patchstack_whitelist_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_wlbl' );
 
 		// Login protection.
-		if ( ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) && floatval( substr( phpversion(), 0, 5 ) ) > 5.5 ) {
+		if ( ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) ) {
 			add_settings_field( 'patchstack_mv_wp_login', __( 'Block access to wp-login.php', 'patchstack' ), array( $this, 'patchstack_hidewplogin_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login' );
 			add_settings_field( 'patchstack_rename_wp_login', '', array( $this, 'patchstack_hidewplogin_rename_input' ), 'patchstack_login_settings', 'patchstack_settings_section_login' );
 		}

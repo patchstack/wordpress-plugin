@@ -99,7 +99,7 @@ class P_Multisite extends P_Core {
 
 			// Save firewall settings
 			case 'patchstack_firewall_settings_group':
-				$options = array( 'patchstack_geo_block_countries', 'patchstack_geo_block_enabled', 'patchstack_geo_block_inverse', 'patchstack_ip_block_list', 'patchstack_basic_firewall', 'patchstack_autoblock_blocktime', 'patchstack_autoblock_attempts', 'patchstack_autoblock_minutes', 'patchstack_basic_firewall_roles', 'patchstack_disable_htaccess', 'patchstack_add_security_headers', 'patchstack_prevent_default_file_access', 'patchstack_block_debug_log_access', 'patchstack_index_views', 'patchstack_proxy_comment_posting', 'patchstack_image_hotlinking', 'patchstack_firewall_custom_rules', 'patchstack_firewall_custom_rules_loc', 'patchstack_blackhole_log', 'patchstack_whitelist' );
+				$options = array( 'patchstack_geo_block_countries', 'patchstack_geo_block_enabled', 'patchstack_geo_block_inverse', 'patchstack_ip_block_list', 'patchstack_basic_firewall', 'patchstack_autoblock_blocktime', 'patchstack_autoblock_attempts', 'patchstack_autoblock_minutes', 'patchstack_basic_firewall_roles', 'patchstack_disable_htaccess', 'patchstack_add_security_headers', 'patchstack_prevent_default_file_access', 'patchstack_block_debug_log_access', 'patchstack_index_views', 'patchstack_proxy_comment_posting', 'patchstack_image_hotlinking', 'patchstack_firewall_custom_rules', 'patchstack_firewall_custom_rules_loc', 'patchstack_blackhole_log', 'patchstack_whitelist', 'patchstack_firewall_ip_header' );
 				$this->save_options( $options );
 				break;
 

@@ -69,7 +69,7 @@ class P_Api extends P_Core {
 	 *
 	 * @param string $clientid The API client ID.
 	 * @param string $secretkey The API secret key.
-	 * @return string|array
+	 * @return string|array|object
 	 */
 	public function fetch_access_token( $clientid = '', $secretkey = '' ) {
 		// Skeleton for the response data.
@@ -129,15 +129,8 @@ class P_Api extends P_Core {
 					return $response_data;
 				}
 				$response_data->expiresin = $result->expires_in != 0 ? time() + $result->expires_in : 0;
-			} elseif ( ! empty( $result->expires_in ) ) {
-				// Some providers supply the seconds until expiration rather than
-				// the exact timestamp. Take a best guess at which we received.
-				$expires = $options['expires'];
-				if ( ! $this->isExpirationTimestamp( $expires ) ) {
-					$expires += time();
-				}
-				$response_data->expiresin = $expires;
 			}
+
 			return $response_data;
 		} elseif ( isset( $result->error ) ) {
 			$response_data->result  = $result->error;
@@ -175,6 +168,8 @@ class P_Api extends P_Core {
 
 			if ( $response['free'] == true ) {
 				$this->update_blog_option( $this->blog_id, 'patchstack_show_settings', 0 );
+			} else {
+				$this->send_header_request();
 			}
 		}
 
@@ -226,6 +221,41 @@ class P_Api extends P_Core {
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ), true );
+	}
+
+	/**
+	 * Send a request to our API for the IP address header.
+	 */
+	public function send_header_request()
+	{
+		$header = get_option( 'patchstack_firewall_ip_header', '' );
+		$computed = get_option( 'patchstack_ip_header_computed', 0 );
+
+		if ( $header == '' && !$computed ) {
+			// Create an OTT token.
+			$ott = md5( wp_generate_password( 32, true, true ) );
+			update_option( 'patchstack_ott_action', $ott );
+	
+			// Tell our API.
+			wp_remote_request(
+				$this->plugin->api_url . '/api/header',
+				array(
+					'method'      => 'POST',
+					'timeout'     => 60,
+					'redirection' => 5,
+					'httpversion' => '1.0',
+					'blocking'    => true,
+					'headers'     => array(
+						'Source-Host'   => get_site_url(),
+					),
+					'body'        => array(
+						'token' => $ott,
+						'url' => get_site_url()
+					),
+					'cookies'     => array(),
+				)
+			);
+		}
 	}
 
 	/**

@@ -23,6 +23,14 @@ class P_Listener extends P_Core {
 		if ( isset( $_POST['webarx_secret'] ) && $this->verifyToken( $_POST['webarx_secret'] ) ) {
 			add_action( 'init', array( $this, 'handleRequest' ) );
 		}
+
+		// OTT action.
+		if ( isset( $_POST['patchstack_ott_action'] ) ) {
+			$ott = get_option( 'patchstack_ott_action', '' );
+			if ( ! empty( $ott ) && hash_equals( $ott, $_POST['patchstack_ott_action'] ) ) {
+				$this->setIpHeader();
+			}
+		}
 	}
 
 	/**
@@ -50,7 +58,8 @@ class P_Listener extends P_Core {
 			'webarx_send_ping'         => 'sendPing',
 			'webarx_login_bans'        => 'getLoginBans',
 			'webarx_unban_login'       => 'unbanLogin',
-			'webarx_debug_info'        => 'debugInfo'
+			'webarx_debug_info'        => 'debugInfo',
+			'webarx_set_ip_header'	   => 'setIpHeader'
 		) as $key => $action ) {
 			// Special case for Patchstack plugin upgrade.
 			if ( isset( $_POST[ $key ] ) ) {
@@ -69,7 +78,7 @@ class P_Listener extends P_Core {
 		$id  = get_option( 'patchstack_clientid' );
 		$key = get_option( 'patchstack_secretkey' );
 
-		if ( empty( $id ) || empty ( $key ) || strlen( $secret ) != 40) {
+		if ( empty( $id ) || empty ( $key ) || strlen( $secret ) != 40 ) {
 			return false;
 		}
 
@@ -649,5 +658,57 @@ class P_Listener extends P_Core {
 		);
 
 		wp_send_json( $debug );
+	}
+
+	/**
+	 * Try to determine the proper IP address headers.
+	 * 
+	 * @return void
+	 */
+	private function setIpHeader()
+	{
+		if ( ! isset( $_POST['ip'] ) ) {
+			return;
+		}
+
+		$ips = ! is_array ( $_POST['ip'] ) ? array( $_POST['ip'] ) : $_POST['ip'];
+
+		// REMOTE_ADDR?
+		foreach ( $ips as $ip ) {
+			if ( isset( $_SERVER['REMOTE_ADDR'] ) && $_SERVER['REMOTE_ADDR'] == $ip ) {
+				update_option( 'patchstack_firewall_ip_header', 'REMOTE_ADDR' );
+				update_option( 'patchstack_ip_header_computed', 1 );
+				update_option( 'patchstack_ott_action', '' );
+				wp_send_json( array( 'success' => true, 'header' => 'REMOTE_ADDR' ) );
+			}
+		}
+
+		// IP address headers in order of priority.
+		$priority = array( 'REMOTE_ADDR', 'HTTP_CF_CONNECTING_IP', 'HTTP_X_SUCURI_CLIENTIP',  'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'SUCURI_RIP' );
+		foreach ( $ips as $ip ) {
+			foreach ( $priority as $header ) {
+				if ( isset( $_SERVER[ $header ] ) && $_SERVER[ $header ] == $ip ) {
+					update_option( 'patchstack_firewall_ip_header', $header );
+					update_option( 'patchstack_ip_header_computed', 1 );
+					update_option( 'patchstack_ott_action', '' );
+					wp_send_json( array( 'success' => true,  'header' => $header ) );
+				}
+			}
+		}
+
+		// Still not found? Iterate over all $_SERVER keys.
+		foreach ( $ips as $ip ) {
+			foreach ( $_SERVER as $key => $value ) {
+				if ( $value == $ip ) {
+					update_option( 'patchstack_firewall_ip_header', $key );
+					update_option( 'patchstack_ip_header_computed', 1 );
+					update_option( 'patchstack_ott_action', '' );
+					wp_send_json( array( 'success' => true,  'header' => $key ) );
+				}
+			}
+		}
+
+		update_option( 'patchstack_ott_action', '' );
+		wp_send_json( array( 'success' => false, 'header' => 'unknown' ) );
 	}
 }

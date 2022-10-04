@@ -153,8 +153,17 @@ class P_Hardening extends P_Core {
 		$ip        = $this->get_ip();
 
 		// Don't block Patchstack.
-		if ( in_array( $_SERVER['REMOTE_ADDR'], $this->ips ) || ( isset( $_POST['webarx_secret'] ) && $this->plugin->listener->verifyToken( $_POST['webarx_secret'] ) ) ) {
-			return;
+		if ( in_array( $ip, $this->ips ) || ( isset( $_POST['webarx_secret'] ) && $this->plugin->listener->verifyToken( $_POST['webarx_secret'] ) ) || isset( $_POST['patchstack_ott_action'] )) {
+
+			// OTT action.
+			if ( isset( $_POST['patchstack_ott_action'] ) ) {
+				$ott = get_option( 'patchstack_ott_action', '' );
+				if ( ! empty( $ott ) && hash_equals( $ott, $_POST['patchstack_ott_action'] ) ) {
+					return;
+				}
+			} else {
+				return;
+			}
 		}
 
 		// Load the required libraries.
@@ -181,6 +190,16 @@ class P_Hardening extends P_Core {
 	 * @return void|WP_Error
 	 */
 	public function disable_wpjson() {
+		// Some default exceptions.
+		$path = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
+		$whitelists = array( '/wp-json/contact-form-7/' );
+		foreach ( $whitelists as $whitelist ) {
+			if ( stripos( $path, $whitelist ) !== false ) {
+				return;
+			}
+		}
+
+		// Block unauthorized users.
 		if ( ! is_user_logged_in() ) {
 			$msg = apply_filters( 'disable_wp_rest_api_error', __( 'The WP REST API cannot be accessed by unauthorized users.', 'disable-wp-rest-api' ) );
 			return new WP_Error( 'rest_authorization_required', $msg, array( 'status' => rest_authorization_required_code() ) );
@@ -334,7 +353,7 @@ class P_Hardening extends P_Core {
 	 * @return void
 	 */
 	public function stop_user_enum() {
-		if ( isset( $_GET['author'] ) && is_numeric( $_GET['author'] ) && ! is_user_logged_in() ) {
+		if ( isset( $_GET['author'] ) && ! is_user_logged_in() && ! is_admin() ) {
 			die( wp_safe_redirect( get_site_url() ) );
 		}
 

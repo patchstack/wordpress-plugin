@@ -16,14 +16,14 @@ class TokenAuth6238 {
 	 * @return bool True if success, false if failure
 	 */
 	public static function verify( $secretkey, $code, $rangein30s = 3 ) {
-		$key           = base32static::decode( $secretkey );
+		$key           = Base32Static::decode( $secretkey );
 		$unixtimestamp = time() / 30;
 
 		for ( $i = -( $rangein30s ); $i <= $rangein30s; $i++ ) {
 			$checktime = (int) ( $unixtimestamp + $i );
 			$thiskey   = self::oath_hotp( $key, $checktime );
 
-			if ( (int) $code == self::oath_truncate( $thiskey, 6 ) ) {
+			if ( self::stringEquals( (string) self::oath_truncate( $thiskey, 6 ), (string) $code ) ) {
 				return true;
 			}
 		}
@@ -38,13 +38,12 @@ class TokenAuth6238 {
 	 * @return string
 	 */
 	public static function generateRandomClue( $length = 16 ) {
-		$b32 = '234567QWERTYUIOPASDFGHJKLZXCVBNM';
-		$s   = '';
-		for ( $i = 0; $i < $length; $i++ ) {
-			$s .= $b32[ mt_rand( 0, 31 ) ];
+		if ( !function_exists( 'random_bytes' ) ) {
+			return Base32Static::encode( random_bytes( 10 ) );
 		}
-
-		return $s;
+		
+		require_once dirname( __FILE__ ) . '/polyfill/lib/random.php';
+		return Base32Static::encode( random_bytes( 10 ) );
 	}
 
 	/**
@@ -89,5 +88,32 @@ class TokenAuth6238 {
 				( ( $hmac_result[ $offset + 2 ] & 0xff ) << 8 ) |
 				( $hmac_result[ $offset + 3 ] & 0xff )
 		) % pow( 10, $length );
+	}
+
+	/**
+	 * Compare 2 strings with each other.
+	 *
+	 * @param string $own
+	 * @param string $user
+	 * @return boolean
+	 */
+	private static function stringEquals($own, $user) {
+		if ( function_exists( 'hash_equals' ) ) {
+			return hash_equals($own, $user);
+		}
+
+		$safeLen = strlen($own);
+		$userLen = strlen($user);
+
+		if ( $userLen != $safeLen ) {
+			return false;
+		}
+
+		$result = 0;
+		for ( $i = 0; $i < $userLen; $i++ ) {
+			$result |= (ord($own[$i]) ^ ord($user[$i]));
+		}
+
+		return $result === 0;
 	}
 }
