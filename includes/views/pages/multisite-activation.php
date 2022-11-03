@@ -27,7 +27,7 @@ $main_admin_url = get_admin_url( get_main_site_id() ) . '/options-general.php?pa
 	<h2 style="padding: 0;">Multisite Activation</h2>
 	<p><?php echo wp_kses( $this->plugin->multisite->error, $this->allowed_html ); ?>
 	<?php
-		if (!$has_token) {
+		if ( ! $has_token ) {
 	?>
 		You must first manually add your WordPress network's primary site (<?php echo esc_html( $main_host['host'] ); ?>) to Patchstack before you can  add the others.<br><br>You can do so by creating an account <a href="https://app.patchstack.com/register" target="_blank">here</a> and then by adding this site <a href="https://app.patchstack.com/sites?add=1" target="_blank">here</a>.<br><br>Once you have obtained the API credentials, the credentials for your site <?php echo esc_html( $main_host['host'] ); ?> can be added <a href="<?php echo esc_url( $main_admin_url ); ?>">here</a>.
 	<?php
@@ -46,7 +46,7 @@ $main_admin_url = get_admin_url( get_main_site_id() ) . '/options-general.php?pa
 	</form>
 
 	<?php
-		if ($activated != '') {
+		if ( $activated != '' ) {
 	?>
 		<br />
 		<h2 style="padding: 0;">Activated</h2>

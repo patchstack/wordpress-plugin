@@ -74,7 +74,6 @@ class P_Login extends P_Core {
 
 		// If we have a valid user object, check to see if the user has 2FA enabled.
 		$enabled = get_user_option( 'webarx_2fa_enabled', $user->ID );
-		$secret  = get_user_option( 'webarx_2fa_secretkey', $user->ID );
 		if ( empty( $enabled ) ) {
 			return $user;
 		}
@@ -86,6 +85,7 @@ class P_Login extends P_Core {
 
 		// Verify the code.
 		require_once dirname( __FILE__ ) . '/2fa/rfc6238.php';
+		$secret  = $this->tfa_get_secret( $user );
 		if ( ! TokenAuth6238::verify( $secret, trim( $_POST['patchstack_2fa'] ) ) ) {
 			return new WP_Error( 'patchstack_2fa_invalid_code', __( 'The 2FA authentication code you entered is invalid.', 'patchstack' ) );
 		}
@@ -100,15 +100,7 @@ class P_Login extends P_Core {
 	 * @return void
 	 */
 	public function tfa_profile_personal_options( $user ) {
-		$secret = get_user_option( 'webarx_2fa_secretkey', $user->ID );
-
-		// If user has no secret key set yet, generate one.
-		if ( empty( $secret ) ) {
-			require_once dirname( __FILE__ ) . '/2fa/rfc6238.php';
-			$secret = TokenAuth6238::generateRandomClue();
-			update_user_option( $user->ID, 'webarx_2fa_secretkey', $secret, true );
-		}
-
+		$secret = $this->tfa_get_secret( $user );
 		require_once dirname( __FILE__ ) . '/views/2fa-profile-configuration.php';
 	}
 
@@ -130,6 +122,32 @@ class P_Login extends P_Core {
 	public function tfa_admin_enqueue_scripts() {
 		wp_register_script( 'patchstack_qrcode', $this->plugin->url . '/assets/js/qrcode.min.js', array(), $this->plugin->version );
 		wp_enqueue_script( 'patchstack_qrcode' );
+	}
+
+	/**
+	 * In case of legacy conditions, we encrypt the secret key and then store it.
+	 * 
+	 * @return string
+	 */
+	private function tfa_get_secret( $user ) {
+		$secret = get_user_option( 'webarx_2fa_secretkey', $user->ID );
+
+		// If user has no secret key set yet, generate one.
+		if ( empty( $secret ) || strlen( $secret ) === 16 ) {
+			if ( empty( $secret ) ) {
+				require_once dirname( __FILE__ ) . '/2fa/rfc6238.php';
+				$secret = TokenAuth6238::generateRandomClue();
+			}
+
+			$enc = $this->encrypt( $secret );
+			update_user_option( $user->ID, 'webarx_2fa_secretkey', $enc['cipher'], true );
+			update_user_option( $user->ID, 'webarx_2fa_secretkey_nonce', $enc['nonce'], true );
+		} else {
+			$nonce = get_user_option( 'webarx_2fa_secretkey_nonce', $user->ID );
+			$secret = $this->decrypt( $secret, $nonce );
+		}
+
+		return $secret;
 	}
 
 	/**

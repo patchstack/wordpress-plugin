@@ -49,7 +49,7 @@ class P_Hide_Login extends P_Core {
 		}
 
 		// Determine if the user is whitelisted.
-		if ( ( stripos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false || $GLOBALS['pagenow'] === 'wp-login.php' || $_SERVER['PHP_SELF'] === '/wp-login.php' ) && !$this->is_whitelisted() ) {
+		if ( ( stripos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false || $GLOBALS['pagenow'] === 'wp-login.php' || $_SERVER['PHP_SELF'] === '/wp-login.php' ) && ! $this->is_whitelisted() ) {
 			$this->plugin->firewall_base->display_error_page( 'login' );
 		}
 
@@ -82,7 +82,7 @@ class P_Hide_Login extends P_Core {
 		$allow = false;
 
 		// Only continue if there are actually any whitelist entries.
-		if ( is_array( $whitelist ) && count( $whitelist ) != 0 ){
+		if ( is_array( $whitelist ) && count( $whitelist ) != 0 ) {
 			$ip = $this->get_ip();
 			foreach ( $whitelist as $entry ) {
 

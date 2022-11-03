@@ -80,8 +80,16 @@ class P_Api extends P_Core {
 		);
 
 		// Determine if the license id/key is set.
-		$client_id     = $this->get_blog_option( $this->blog_id, 'patchstack_clientid', false ) ? $this->get_blog_option( $this->blog_id, 'patchstack_clientid', false ) : $clientid;
-		$client_secret = $this->get_blog_option( $this->blog_id, 'patchstack_secretkey', false ) ? $this->get_blog_option( $this->blog_id, 'patchstack_secretkey', false ) : $secretkey;
+		$client_id = $this->get_blog_option( $this->blog_id, 'patchstack_clientid', $clientid );
+
+		// Decrypt the secret key, if it is encrypted.
+		$client_secret = $this->get_blog_option( $this->blog_id, 'patchstack_secretkey', $secretkey );
+		$client_nonce = $this->get_blog_option( $this->blog_id, 'patchstack_secretkey_nonce', false );
+		if ( $client_nonce ) {
+			$client_secret = $this->decrypt( $client_secret, $client_nonce );
+		}
+
+		// Make sure these values are set.
 		if ( empty( $client_id ) || empty( $client_secret ) ) {
 			$response_data->result  = 'failed';
 			$response_data->message = __( 'API keys missing! Unable to obtain an access token.', 'patchstack' );
@@ -231,7 +239,7 @@ class P_Api extends P_Core {
 		$header = get_option( 'patchstack_firewall_ip_header', '' );
 		$computed = get_option( 'patchstack_ip_header_computed', 0 );
 
-		if ( $header == '' && !$computed ) {
+		if ( $header == '' && ! $computed ) {
 			// Create an OTT token.
 			$ott = md5( wp_generate_password( 32, true, true ) );
 			update_option( 'patchstack_ott_action', $ott );

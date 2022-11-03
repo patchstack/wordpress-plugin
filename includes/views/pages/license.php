@@ -14,6 +14,8 @@ if ( isset( $_GET['activated'] ) && $status ) {
 
 // Generate the link to turn on settings management.
 $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patchstack_settings_nonce=' . wp_create_nonce( 'patchstack_settings_nonce' );
+
+if (!$show_settings) {
 ?>
 <div class="patchstack-free" style="<?php echo $show_settings ? 'display: none;' : ''; ?>">
 	<div>
@@ -25,7 +27,7 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 				<input class="regular-text" type="text" id="patchstack_api_client_id" value="<?php echo esc_attr( get_option( 'patchstack_clientid', false ) ); ?>" placeholder="Enter Site ID">
 
 				<label for="patchstack_api_client_secret_key">Site Secret Key</label>
-				<input class="regular-text" type="text" id="patchstack_api_client_secret_key" value="<?php echo esc_attr( get_option( 'patchstack_secretkey', false ) ); ?>" placeholder="Enter Site Secret Key">
+				<input class="regular-text" type="text" id="patchstack_api_client_secret_key" value="<?php echo esc_attr( $this->get_secret_key() ); ?>" placeholder="Enter Site Secret Key">
 			</div>
 
 			<div class="patchstack-sub">
@@ -54,6 +56,9 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 		Click <a href="<?php echo esc_url( $url ); ?>">here</a> to manage the Patchstack settings through WordPress.
 	</p>
 </div>
+<?php
+}
+?>
 
 <div style="<?php echo ! $show_settings ? 'display: none;' : ''; ?>">
 	<div class="patchstack-font" 
@@ -83,10 +88,9 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 			You generally do not have to touch these values.<br /><br />
 			
 			If both are empty and you do not know your site ID and secret key, you can find it by following these steps:<br />
-			1. Go to your site on the Patchstack App.<br />
-			2. Click on the "Site Settings" button on the right.<br />
-			3. Click on "Site Credentials & Download Plugin".<br />
-			4. The site ID and secret key will be displayed on this page.
+			1. Go to your site on the <a href="https://app.patchstack.com/sites" target="_blank">Patchstack App</a>.<br />
+			2. Click on the green gear icon next to the site URL on top of the page.<br />
+			3. The site ID and secret key will be displayed on this page.
 		</p>
 		<table class="form-table patchstack-form-table">
 			<tr>
@@ -100,7 +104,7 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 			<tr>
 				<th><label for="patchstack_api_client_secret_key"><?php echo __( 'Site Secret Key', 'patchstack' ); ?></label></th>
 				<td>
-					<input class="regular-text" type="text" id="patchstack_api_client_secret_key" value="<?php echo esc_attr( get_option( 'patchstack_secretkey', false ) ); ?>" placeholder="Enter your site secret key here...">
+					<input class="regular-text" type="text" id="patchstack_api_client_secret_key" value="<?php echo esc_attr( $this->get_secret_key() ); ?>" placeholder="Enter your site secret key here...">
 				</td>
 			</tr>
 			<tr>

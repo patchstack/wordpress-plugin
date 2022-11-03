@@ -119,6 +119,7 @@ class P_Admin_Options extends P_Core {
 		'patchstack_firewall_htaccess_hash'             => '',
 		'patchstack_clientid'                           => false,
 		'patchstack_secretkey'                          => false,
+		'patchstack_secretkey_nonce'                    => '',
 		'patchstack_license_free'                       => 0,
 		'patchstack_api_token'                          => '',
 		'patchstack_whitelist'                          => '',
@@ -126,6 +127,7 @@ class P_Admin_Options extends P_Core {
 		'patchstack_firewall_log_lastid'                => 0,
 		'patchstack_eventlog_lastid'                    => 0,
 		'patchstack_ott_action'							=> '',
+		'patchstack_enc_nonce'							=> '',
 
 		// Admin page rename options.
 		'patchstack_mv_wp_login'                        => 0,

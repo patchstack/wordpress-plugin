@@ -115,7 +115,7 @@ class Patchstack_Network_Sites_Table extends WP_List_Table {
 					'title'           => esc_html( $b->blogname ),
 					'url'             => '<a href="' . esc_url( $site_info->siteurl ). '">' . esc_url( $site_info->siteurl ) . '</a>',
 					'activated'       => $is_activated ? 'Activated' : 'Deactivated',
-					'firewall_status' => $is_firewall_enabled && !$free ? 'Enabled' : 'Disabled',
+					'firewall_status' => $is_firewall_enabled && ! $free ? 'Enabled' : 'Disabled',
 					'edit'            => $is_activated ? '<a href="' . esc_url( get_admin_url( $b->blog_id ) ) . 'options-general.php?page=patchstack">Edit Settings</a>' : '',
 				);
 			}

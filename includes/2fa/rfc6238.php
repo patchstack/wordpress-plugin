@@ -38,7 +38,7 @@ class TokenAuth6238 {
 	 * @return string
 	 */
 	public static function generateRandomClue( $length = 16 ) {
-		if ( !function_exists( 'random_bytes' ) ) {
+		if ( function_exists( 'random_bytes' ) ) {
 			return Base32Static::encode( random_bytes( 10 ) );
 		}
 		
@@ -97,13 +97,13 @@ class TokenAuth6238 {
 	 * @param string $user
 	 * @return boolean
 	 */
-	private static function stringEquals($own, $user) {
+	private static function stringEquals( $own, $user ) {
 		if ( function_exists( 'hash_equals' ) ) {
-			return hash_equals($own, $user);
+			return hash_equals( $own, $user );
 		}
 
-		$safeLen = strlen($own);
-		$userLen = strlen($user);
+		$safeLen = strlen( $own );
+		$userLen = strlen( $user );
 
 		if ( $userLen != $safeLen ) {
 			return false;
@@ -111,7 +111,7 @@ class TokenAuth6238 {
 
 		$result = 0;
 		for ( $i = 0; $i < $userLen; $i++ ) {
-			$result |= (ord($own[$i]) ^ ord($user[$i]));
+			$result |= ( ord( $own[$i] ) ^ ord( $user[$i] ) );
 		}
 
 		return $result === 0;

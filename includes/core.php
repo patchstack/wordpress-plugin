@@ -198,17 +198,160 @@ class P_Core {
 	}
 
 	/**
-	 * Attempt to get the client IP by checking all possible IP (proxy) headers.
+	 * Grab the IP address of the user. Give the override IP header priority.
+	 * If this does not exist, we should always default to REMOTE_ADDR.
 	 *
 	 * @return string
 	 */
 	public function get_ip() {
-		// IP address header override set?
 		$override = get_site_option( 'patchstack_firewall_ip_header', '' );
 		if ( $override != '' && isset( $_SERVER[ $override ] ) ) {
 			return $_SERVER[ $override ];
 		}
 
 		return isset( $_SERVER['REMOTE_ADDR'] ) ? $_SERVER['REMOTE_ADDR'] : '';
+	}
+
+	/**
+	 * Grab the secret key used for API communication.
+	 * 
+	 * @param string $custom
+	 * @return string
+	 */
+	public function get_secret_key( $custom = '' ) {
+		if ( $custom != '' ) {
+			return $this->encrypt( $custom );
+		}
+
+		$secret = get_option( 'patchstack_secretkey', '' );
+		if ( ! $secret ) {
+			return '';
+		}
+
+		if ( strlen( $secret ) === 40 ) {
+			$enc = $this->encrypt( $secret );
+
+			update_option( 'patchstack_secretkey', $enc['cipher'] );
+			update_option( 'patchstack_secretkey_nonce', $enc['nonce'] );
+
+			return $secret;
+		}
+
+		$nonce = get_option( 'patchstack_secretkey_nonce' );
+		return $this->decrypt( $secret, $nonce );
+	}
+
+	/**
+	 * Set the secret key used for API communication.
+	 * 
+	 * @param string $secret
+	 * @return void
+	 */
+	public function set_secret_key( $secret ) {
+		$enc = $this->encrypt( $secret );
+
+		update_option( 'patchstack_secretkey', $enc['cipher'] );
+		update_option( 'patchstack_secretkey_nonce', $enc['nonce'] );
+	}
+
+	/**
+	 * Determine which encryption dependency we can use.
+	 * 
+	 * @return string
+	 */
+	public function get_enc_type() {
+		if ( function_exists('sodium_crypto_generichash') ) {
+			return 'native';
+		}
+
+		return 'compat';
+	}
+
+	/**
+	 * Get the unique nonce that is used for the secretbox.
+	 * 
+	 * @return string
+	 */
+	public function get_enc_nonce() {
+		if ( function_exists('random_bytes') ) {
+			return random_bytes( 24 );
+		}
+
+		require_once dirname( __FILE__ ) . '/2fa/polyfill/lib/random.php';
+		return random_bytes( 24 );
+	}
+
+	/**
+	 * Encrypt a string.
+	 * 
+	 * @param string $message
+	 * @return array
+	 */
+	public function encrypt( $message ) {
+		$enc_type = $this->get_enc_type();
+		$nonce = $this->get_enc_nonce();
+
+		try {
+			// Use the PHP native encryption functions.
+			if ( $enc_type == 'native' ) {
+				$key = sodium_crypto_generichash( AUTH_KEY );
+
+				return [
+					'cipher' => sodium_bin2hex( sodium_crypto_secretbox( $message, $nonce, $key ) ),
+					'nonce' => sodium_bin2hex( $nonce )
+				];
+			}
+
+			// Use the Sodium polyfill library part of WordPress core.
+			require_once ABSPATH . WPINC . '/sodium_compat/autoload.php';
+			$key = \Sodium\crypto_generichash( AUTH_KEY );
+
+			return [
+				'cipher' => \Sodium\bin2hex( \Sodium\crypto_secretbox( $message, $nonce, $key ) ),
+				'nonce' => \Sodium\bin2hex( $nonce )
+			];
+		} catch ( Exception $e ) {
+			return [
+				'cipher' => $message,
+				'nonce' => ''
+			];
+		}
+	}
+
+	/**
+	 * Decrypt a cipher to plain-text.
+	 * 
+	 * @param string $cipher
+	 * @param string $nonce
+	 * @return string
+	 */
+	public function decrypt( $cipher, $nonce ) {
+		$enc_type = $this->get_enc_type();
+
+		// If we received an empty nonce, we assume it was never properly encrypted to begin with.
+		if ( $nonce == '' ) {
+			return $cipher;
+		}
+
+		try {
+			// Determine if we should use native or polyfill functions.
+			if ( $enc_type == 'native' ) {
+				$key = sodium_crypto_generichash( AUTH_KEY );
+				$dec = sodium_crypto_secretbox_open( sodium_hex2bin( $cipher ), sodium_hex2bin( $nonce ), $key );
+			} else {
+				require_once ABSPATH . WPINC . '/sodium_compat/autoload.php';
+				$key = \Sodium\crypto_generichash( AUTH_KEY );
+				$dec = \Sodium\crypto_secretbox_open( sodium_hex2bin( $cipher ), sodium_hex2bin( $nonce ), $key );
+			}
+		} catch ( Exception $e ) {
+			return $cipher;
+		}
+
+		// In case decryption failed, return null.
+		if ( ! $dec ) {
+			return null;
+		}
+
+		return $dec;
 	}
 }

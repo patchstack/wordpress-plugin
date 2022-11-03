@@ -156,7 +156,7 @@ class P_Activation extends P_Core {
 		if ( $this->plugin->client_id != 'PATCHSTACK_CLIENT_ID' && $this->plugin->private_key != 'PATCHSTACK_PRIVATE_KEY' ) {
 			$this->alter_license( $this->plugin->client_id, $this->plugin->private_key, 'activate' );
 		} elseif ( get_option( 'patchstack_clientid', false ) != false && get_option( 'patchstack_secretkey', false ) != false ) {
-			$this->alter_license( get_option( 'patchstack_clientid' ), get_option( 'patchstack_secretkey' ), 'activate' );
+			$this->alter_license( get_option( 'patchstack_clientid' ), $this->get_secret_key(), 'activate' );
 		} else {
 			update_option( 'patchstack_license_free', '1' );
 		}
@@ -199,7 +199,10 @@ class P_Activation extends P_Core {
 
 		// Set the client id and secret key.
 		update_blog_option( $site->id, 'patchstack_clientid', $license['id'] );
-		update_blog_option( $site->id, 'patchstack_secretkey', $license['secret'] );
+		$enc = $this->get_secret_key( $license['secret'] );
+		update_blog_option( $site->id, 'patchstack_secretkey', $enc['cipher'] );
+		update_blog_option( $site->id, 'patchstack_secretkey_nonce', $enc['nonce'] );
+
 		$this->plugin->api->blog_id = $site->id;
 
 		// Activate the license and update firewall status after activating the plugin.
@@ -301,9 +304,11 @@ class P_Activation extends P_Core {
 	public function alter_license( $id, $secret, $action ) {
 		// Store current keys in tmp variable so in case it fails, we can set it back.
 		$tmp_id  = get_option( 'patchstack_clientid' );
-		$tmp_key = get_option( 'patchstack_secretkey' );
+		$tmp_key = $this->get_secret_key();
+
+		// Set the new values.
 		update_option( 'patchstack_clientid', $id );
-		update_option( 'patchstack_secretkey', $secret );
+		$this->set_secret_key( $secret );
 
 		// Activate the license.
 		if ( $action == 'activate' ) {
@@ -312,7 +317,7 @@ class P_Activation extends P_Core {
 			// Valid result?
 			if ( ! $api_result ) {
 				update_option( 'patchstack_clientid', $tmp_id );
-				update_option( 'patchstack_secretkey', $tmp_key );
+				$this->set_secret_key( $tmp_key );
 				return array(
 					'result'  => 'error',
 					'message' => 'Cannot activate license!',
@@ -362,7 +367,7 @@ class P_Activation extends P_Core {
 		$header = get_option( 'patchstack_firewall_ip_header', '' );
 		$computed = get_option( 'patchstack_ip_header_computed', 0 );
 
-		if ( $header == '' && !$computed ) {
+		if ( $header == '' && ! $computed ) {
 			// Create an OTT token.
 			$ott = md5( wp_generate_password( 32, true, true ) );
 			update_option( 'patchstack_ott_action', $ott );

@@ -737,11 +737,17 @@ class P_Firewall extends P_Core {
 			$this->log_hacker( $fid );
 		}
 
+		// Supported by a number of popular caching plugins.
+		if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+			define( 'DONOTCACHEPAGE', true );
+		}
+
+		// Send forbidden headers and no-caching headers as well.
 		status_header(403);
 		send_nosniff_header();
 		nocache_headers();
 
-		if ($fid == 'login' ) {
+		if ( $fid == 'login' ) {
 			require_once dirname( __FILE__ ) . '/views/access-denied-login.php';
 		} else {
 			require_once dirname( __FILE__ ) . '/views/access-denied.php';

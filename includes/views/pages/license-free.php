@@ -45,7 +45,7 @@ $url = '?page=' . esc_attr( $page ) . '&tab=license&action=enable_settings&patch
 			<input class="regular-text" type="text" id="patchstack_api_client_id" value="<?php echo esc_attr( get_option( 'patchstack_clientid', false ) ); ?>" placeholder="Enter Site ID">
 
 			<label for="patchstack_api_client_secret_key">Site Secret Key</label>
-			<input class="regular-text" type="text" id="patchstack_api_client_secret_key" value="<?php echo esc_attr( get_option( 'patchstack_secretkey', false ) ); ?>" placeholder="Enter Site Secret Key">
+			<input class="regular-text" type="text" id="patchstack_api_client_secret_key" value="<?php echo esc_attr( $this->get_secret_key() ); ?>" placeholder="Enter Site Secret Key">
 		</div>
 
 		<div class="patchstack-sub">

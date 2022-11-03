@@ -17,7 +17,7 @@ if ( ( ! $show_settings && $_GET['page'] != 'patchstack-multisite-settings' ) ||
 	$_GET['tab'] = $active_tab = 'license';
 }
 
-if ( ( $is_free || !$is_free && $status) && $active_tab != 'license' && $_GET['page'] == 'patchstack-multisite-settings' ) {
+if ( ( $is_free || ! $is_free && $status ) && $active_tab != 'license' && $_GET['page'] == 'patchstack-multisite-settings' ) {
 	$_GET['tab'] = $active_tab = 'multisite';
 }
 

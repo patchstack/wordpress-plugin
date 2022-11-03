@@ -76,7 +76,7 @@ class P_Listener extends P_Core {
 	 */
 	public function verifyToken( $secret ) {
 		$id  = get_option( 'patchstack_clientid' );
-		$key = get_option( 'patchstack_secretkey' );
+		$key = $this->get_secret_key();
 
 		if ( empty( $id ) || empty ( $key ) || strlen( $secret ) != 40 ) {
 			return false;
@@ -433,13 +433,13 @@ class P_Listener extends P_Core {
 		}
 
 		// Loop through the options and update their value.
-		$exclude_filter = array('patchstack_firewall_custom_rules');
+		$exclude_filter = array( 'patchstack_firewall_custom_rules', 'patchstack_whitelist' );
 		foreach ( $options as $key => $value ) {
 			if ( array_key_exists( $key, $this->plugin->admin_options->options ) ) {
 
 				// Some options should not be filtered and could cause unexpected behavior if they are filtered.
 				if ( ! in_array( $key, $exclude_filter ) ) {
-					$value = map_deep($value, 'wp_filter_nohtml_kses');
+					$value = map_deep( $value, 'wp_filter_nohtml_kses' );
 				}
 				
 				update_option( $key, $value, true );
