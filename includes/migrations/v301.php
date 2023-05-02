@@ -12,12 +12,12 @@ $lastid_firewall = get_option( 'patchstack_firewall_log_lastid', 0 );
 $lastid_event = get_option( 'patchstack_eventlog_lastid', 0 );
 
 // Get the current first id.
-$first_firewall = $wpdb->get_var( 'SELECT id FROM ' . $wpdb->prefix . 'patchstack_firewall_log ORDER BY id ASC LIMIT 0, 1' );
-$first_event = $wpdb->get_var( 'SELECT id FROM ' . $wpdb->prefix . 'patchstack_event_log ORDER BY id ASC LIMIT 0, 1' );
+$first_firewall = $wpdb->get_var( 'SELECT id FROM ' . $prefix . 'patchstack_firewall_log ORDER BY id ASC LIMIT 0, 1' );
+$first_event = $wpdb->get_var( 'SELECT id FROM ' . $prefix . 'patchstack_event_log ORDER BY id ASC LIMIT 0, 1' );
 
 // Get the current last id.
-$last_firewall = $wpdb->get_var( 'SELECT id FROM ' . $wpdb->prefix . 'patchstack_firewall_log ORDER BY id DESC LIMIT 0, 1' );
-$last_event = $wpdb->get_var( 'SELECT id FROM ' . $wpdb->prefix . 'patchstack_event_log ORDER BY id DESC LIMIT 0, 1' );
+$last_firewall = $wpdb->get_var( 'SELECT id FROM ' . $prefix . 'patchstack_firewall_log ORDER BY id DESC LIMIT 0, 1' );
+$last_event = $wpdb->get_var( 'SELECT id FROM ' . $prefix . 'patchstack_event_log ORDER BY id DESC LIMIT 0, 1' );
 
 // Update the lastid value of the firewall log.
 if ( ! is_null( $first_firewall ) && ! is_null( $last_firewall ) ) {

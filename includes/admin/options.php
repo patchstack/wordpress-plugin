@@ -117,11 +117,14 @@ class P_Admin_Options extends P_Core {
 		'patchstack_blackhole_log'                      => '',
 		'patchstack_software_data_hash'                 => '',
 		'patchstack_firewall_htaccess_hash'             => '',
+		'patchstack_license_expiry'						=> '',
 		'patchstack_clientid'                           => false,
 		'patchstack_secretkey'                          => false,
 		'patchstack_secretkey_nonce'                    => '',
 		'patchstack_license_free'                       => 0,
 		'patchstack_api_token'                          => '',
+		'patchstack_subscription_class'					=> '',
+		'patchstack_last_license_check'					=> 0,
 		'patchstack_whitelist'                          => '',
 		'patchstack_show_settings'                      => 0,
 		'patchstack_firewall_log_lastid'                => 0,
@@ -155,14 +158,22 @@ class P_Admin_Options extends P_Core {
 		// Multisite options
 		add_network_option( null, 'patchstack_multisite_installed', 0 );
 
+		// Get the class value and convert.
+		$class = get_option( 'patchstack_subscription_class', '' );
+		$is_community = $class != '' && (int) $class === 0;
+
 		// All (sub)sections that show up.
 		add_settings_section( 'patchstack_settings_section_hardening', __( 'Security Configurations', 'patchstack' ), false, 'patchstack_hardening_settings' );
 		add_settings_section( 'patchstack_settings_section_hardening_captcha', __( '<hr style="height:1px;border:none;background-color: rgba(170, 189, 215, 0.1);"><br /> reCAPTCHA<br /><span style="font-size: 13px; color: #d0d0d0;">It should be noted that the reCAPTCHA feature only applies to WordPress its core features at this time. Not custom forms or of third party plugins.</span>', 'patchstack' ), false, 'patchstack_hardening_settings' );
 		add_settings_section( 'patchstack_settings_section_firewall', __( 'Firewall settings', 'patchstack' ), false, 'patchstack_firewall_settings' );
-		if ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) {
+		if ( ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) && ! $is_community ) {
 			add_settings_section( 'patchstack_settings_section_firewall_htaccess', __( '.htaccess Features', 'patchstack' ), false, 'patchstack_firewall_settings' );
 		}
-		add_settings_section( 'patchstack_settings_section_firewall_geo', __( 'Country Blocking', 'patchstack' ), false, 'patchstack_firewall_settings' );
+
+		if (! $is_community ) {
+			add_settings_section( 'patchstack_settings_section_firewall_geo', __( 'Country Blocking', 'patchstack' ), false, 'patchstack_firewall_settings' );
+		}
+
 		add_settings_section( 'patchstack_settings_section_firewall_wlbl', __( 'IP Whitelist &amp; Blacklist', 'patchstack' ), false, 'patchstack_firewall_settings' );
 		add_settings_section( 'patchstack_settings_section_cookienotice', __( 'Cookie Notice Settings', 'patchstack' ), false, 'patchstack_cookienotice_settings' );
 		add_settings_section( 'patchstack_settings_section_login', __( 'Login Protection', 'patchstack' ), false, 'patchstack_login_settings' );
@@ -199,12 +210,16 @@ class P_Admin_Options extends P_Core {
 		// Firewall.
 		add_settings_field( 'patchstack_basic_firewall', __( 'Enable firewall', 'patchstack' ), array( $this, 'patchstack_basic_firewall_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall' );
 		add_settings_field( 'patchstack_basic_firewall_roles', __( 'Firewall user role whitelist', 'patchstack' ), array( $this, 'patchstack_basic_firewall_roles_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall' );
-		add_settings_field( 'patchstack_basic_firewall_geo_enabled', __( 'Country Blocking Enabled', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_enabled_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
-		add_settings_field( 'patchstack_basic_firewall_geo_inverse', __( 'Inversed Check', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_inverse_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
-		add_settings_field( 'patchstack_basic_firewall_geo_countries', __( 'Countries To Block', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_countries_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
+		
+		if ( ! $is_community ) {
+			add_settings_field( 'patchstack_basic_firewall_geo_enabled', __( 'Country Blocking Enabled', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_enabled_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
+			add_settings_field( 'patchstack_basic_firewall_geo_inverse', __( 'Inversed Check', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_inverse_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
+			add_settings_field( 'patchstack_basic_firewall_geo_countries', __( 'Countries To Block', 'patchstack' ), array( $this, 'patchstack_basic_firewall_geo_countries_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_geo' );
+		}
+
 		add_settings_field( 'patchstack_firewall_ip_header', __( 'IP Address Header Override', 'patchstack' ), array( $this, 'patchstack_firewall_ip_header_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall' );
 
-		if ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) {
+		if ( ( ! is_multisite() || ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' ) ) && ! $is_community ) {
 			add_settings_field( 'patchstack_disable_htaccess', __( 'Disable .htaccess features', 'patchstack' ), array( $this, 'patchstack_disable_htaccess_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_htaccess' );
 			add_settings_field( 'patchstack_add_security_headers', __( 'Add security headers', 'patchstack' ), array( $this, 'patchstack_add_security_headers_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_htaccess' );
 			add_settings_field( 'patchstack_prevent_default_file_access', __( 'Prevent default WordPress file access', 'patchstack' ), array( $this, 'patchstack_prevent_default_file_access_input' ), 'patchstack_firewall_settings', 'patchstack_settings_section_firewall_htaccess' );

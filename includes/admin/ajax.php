@@ -156,18 +156,23 @@ class P_Admin_Ajax extends P_Core {
 	 * @return void
 	 */
 	public function activate_license() {
-		if ( ! isset( $_POST['clientid'], $_POST['secretkey'] ) || !ctype_digit( $_POST['clientid'] ) ) {
+		if ( ! isset( $_POST['key'] ) || strpos( $_POST['key'], '-' ) === false) {
 			wp_send_json(
 				array( 
 					'result' => 'error',
-					'error_message' => 'Fill in all of the fields properly.'
+					'error_message' => 'An invalid API key was provided.'
 				)
 			);
 		}
 
+		// Since we have the keys combined into one now, split them up here.
+		$split = explode('-', $_POST['key']);
+		$secretkey = $split[0];
+		$clientid = $split[1];
+
 		// Test the new keys.
 		update_option( 'patchstack_api_token', '' );
-		$results = $this->plugin->activation->alter_license( wp_filter_nohtml_kses( $_POST['clientid'] ), wp_filter_nohtml_kses( $_POST['secretkey'] ), 'activate' );
+		$results = $this->plugin->activation->alter_license( wp_filter_nohtml_kses( $clientid ), wp_filter_nohtml_kses( $secretkey ), 'activate' );
 		if ( $results ) {
 			$response            = $this->plugin->api->update_license_status();
 			$results['response'] = $response;

@@ -59,7 +59,8 @@ class P_Listener extends P_Core {
 			'webarx_login_bans'        => 'getLoginBans',
 			'webarx_unban_login'       => 'unbanLogin',
 			'webarx_debug_info'        => 'debugInfo',
-			'webarx_set_ip_header'	   => 'setIpHeader'
+			'webarx_set_ip_header'	   => 'setIpHeader',
+			'webarx_refresh_license'   => 'refreshLicense'
 		) as $key => $action ) {
 			// Special case for Patchstack plugin upgrade.
 			if ( isset( $_POST[ $key ] ) ) {
@@ -665,8 +666,7 @@ class P_Listener extends P_Core {
 	 * 
 	 * @return void
 	 */
-	private function setIpHeader()
-	{
+	private function setIpHeader() {
 		if ( ! isset( $_POST['ip'] ) ) {
 			return;
 		}
@@ -710,5 +710,18 @@ class P_Listener extends P_Core {
 
 		update_option( 'patchstack_ott_action', '' );
 		wp_send_json( array( 'success' => false, 'header' => 'unknown' ) );
+	}
+
+	/**
+	 * Refresh the license and subscription information.
+	 * 
+	 * @return void
+	 */
+	private function refreshLicense (){
+		do_action( 'update_license_status' );
+		do_action( 'patchstack_send_software_data' );
+		do_action( 'patchstack_post_dynamic_firewall_rules' );
+		
+		wp_send_json( array( 'success' => true ) );
 	}
 }

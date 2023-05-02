@@ -185,6 +185,11 @@ class P_Api extends P_Core {
 			$this->update_blog_option( $this->blog_id, 'patchstack_license_activated', true );
 		}
 
+		if ( isset( $response['class'] ) ) {
+			$this->update_blog_option( $this->blog_id, 'patchstack_subscription_class', $response['class'] );
+			$this->update_blog_option( $this->blog_id, 'patchstack_last_license_check', time() );
+		}
+
 		return $response;
 	}
 

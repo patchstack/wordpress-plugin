@@ -228,13 +228,13 @@
 .patchstack-content-inner input[type=submit],
 .patchstack-form-wrap input[type=submit] {
     height: auto;
-    padding: 12px 30px !important;
-    color: #17191e!important;
+    padding: 18px 30px !important;
+    color: #B2D675!important;
     border: none;
     border-radius: 4px !important;
-    background-color: #b2d675;
-    font-size: 13px !important;
-    font-weight: 500 !important;
+    background-color: rgba(178, 214, 117, 0.18);
+    font-size: 15px !important;
+    font-weight: 400 !important;
     line-height: 20px;
     -webkit-box-shadow: none;
     box-shadow: none;
@@ -246,17 +246,12 @@
     -ms-transition: all .3s ease-in-out
 }
 
-.patchstack-content-inner input[type=submit]:hover,
-.patchstack-form-wrap input[type=submit]:focus {
-    background-color: #2c405a
-}
-
 .patchstack-content-inner input[type=submit]:focus,
 .patchstack-content-inner input[type=submit]:hover,
 .patchstack-form-wrap input[type=submit]:focus,
 .patchstack-form-wrap input[type=submit]:hover {
     background-color: #b2d675;
-    opacity: 0.2;
+    color: #000 !important;
 }
 
 .form-table th,
@@ -358,7 +353,8 @@
 }
 
 .patchstack-form-table {
-    border-collapse: inherit
+    border-collapse: inherit;
+    margin-top: 0;
 }
 
 table {
@@ -869,37 +865,23 @@ a.label:hover {
 
 .patchstack-plan {
     background:#272930;
-    border-radius: 4px;
+    border-radius: 8px;
     padding: 32px;
     color: #acacac;
     font-size: 15px;
-    width: 256px;
-    height: 374px;
+    width: 564px;
     float: left;
     position: relative;
-    margin-top: 70px;
+    margin-top: 32px;
+}
+
+.patchstack-plan a {
+    color: #B2D675;
+    text-decoration: none;
 }
 
 .patchstack-plan1 {
     margin-right: 80px;
-}
-
-.patchstack-plan1::before {
-    content: 'Start monitoring for vulnerabilities';
-    position: absolute;
-    top: -35px;
-    left: 0;
-    color: #fff;
-    font-size: 15px;
-}
-
-.patchstack-plan2::before {
-    content: 'Already have an account?';
-    position: absolute;
-    top: -35px;
-    left: 0;
-    color: #fff;
-    font-size: 15px;
 }
 
 .patchstack-is-size-4 {
@@ -944,8 +926,9 @@ a.label:hover {
 
 .patchstack-plan p {
     color: #acacac;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 20px;
+    margin: 0;
 }
 
 .patchstack-plan1 p {
@@ -999,8 +982,8 @@ a.label:hover {
     width: 184px;
     margin: 0 auto;
     float: initial;
-    margin-top: 30px;
-    margin-bottom: 30px;
+    margin-top: 32px;
+    margin-bottom: 32px;
 }
 
 .patchstack-free .patchstack-content-table {
@@ -1008,7 +991,7 @@ a.label:hover {
 }
 
 .patchstack-free .patchstack-content-table>.patchstack-content-inner {
-    max-width: 45rem;
+    max-width: 40rem;
     margin: 0 auto;
     float: initial;
 }
@@ -1020,25 +1003,38 @@ a.label:hover {
 }
 
 .patchstack-free h1 {
-    color: #fff;
+    color: #acacac;
     font-family: 'Faktum';
-    font-weight: 300!important;
-    font-size: 25px;
+    font-weight: 400!important;
+    font-size: 15px;
     text-align: center;
+}
+
+.patchstack-free h1 a {
+    color: #B2D675;
+    text-decoration: none;
 }
 
 .patchstack-free .form-table input[type=text] {
     background: transparent;
     width: 100%;
     border: 2px solid rgba(170, 189, 215, 0.1) !important;
-    padding: 11px 15px;
+    padding: 17px 15px;
+    border-radius: 4px;
+    margin: 32px 0;
 }
 
 .patchstack-free .form-table label {
     color: #fff;
-    font-size: 11px;
-    margin: 15px 0 5px 0;
+    font-size: 15px;
+    margin: 0;
     display: inline-block;
+    width: 100%;
+}
+
+.patchstack-free .form-table label span {
+    float: right;
+    color: #B2D675;
 }
 
 .patchstack-free .button-primary {
@@ -1083,7 +1079,7 @@ a.label:hover {
 }
 
 .patchstack-premium {
-    max-width: 19rem !important;
+    max-width: 40rem !important;
     margin: 0 auto;
     float: initial !important;
     width: initial !important;
@@ -1098,7 +1094,7 @@ a.label:hover {
 }
 
 #patchstack-activate {
-    margin-top: 42px;
+    margin-top: 0;
 }
 
 .patchstack-license-button #patchstack-activate {
@@ -1139,15 +1135,108 @@ p.patchstack-upsell img {
     top: 7px;
 }
 
-.patchstack-premium p.patchstack-upsell {
-    width: 500px;
-    margin-left: -90px;
-}
-
 .patchstack-active-tab-multisite {
     max-width: 35rem !important;
 }
 
 .multisite .patchstack-active-tab-hardening {
     max-width: 35rem !important;
+}
+
+.patchstack-status {
+    width: 100%;
+}
+
+.patchstack-status:first-child {
+    color: #fff;
+    font-family: 'Faktum';
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.patchstack-status-label {
+    font-size: 13px;
+    border-radius: 2px;
+    background: rgba(178, 214, 117, 0.18);
+    color: #B2D675;
+    padding: 5px 10px 5px 8px;
+    margin-left: auto;
+    order: 2;
+}
+
+.patchstack-status-label-error {
+    background: rgba(237, 100, 94, 0.3);
+    color: #ED645E
+}
+
+.patchstack-protection {
+    background: #2E3036;
+    border-radius: 8px;
+    padding: 16px;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 400;
+    line-height: 28px;
+    margin: 32px 0;
+    display: flex;
+    column-gap: 8px;
+    align-items: center;
+}
+
+.patchstack-protection a.button-primary {
+    background: #B2D675;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.08);
+    color: #000;
+    width: initial;
+    margin: 0;
+    margin-left: auto;
+    order: 2;
+}
+
+.patchstack-loading {
+    display: none;
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 0 auto;
+}
+
+.patchstack-loading div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin: 8px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    animation: patchstack-loading 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #fff transparent transparent transparent;
+}
+
+.patchstack-loading div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+
+.patchstack-loading div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+
+.patchstack-loading div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+
+@keyframes patchstack-loading {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+p.patchstack-resync {
+    color: #B2D675;
+    margin-top: 32px;
+    text-align: center;
 }

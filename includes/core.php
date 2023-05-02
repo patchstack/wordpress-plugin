@@ -198,6 +198,70 @@ class P_Core {
 	}
 
 	/**
+	 * Convert the subscription class name to its text variant.
+	 * 
+	 * @param int $class
+	 * @return string
+	 */
+	public function get_subscription_name( $class ) {
+		switch ( $class ) {
+			case 0:
+				return 'Community';
+			case 1:
+			case 6:
+				return 'Developer';
+			case 7:
+				return 'Business';
+			default:
+				return 'Unknown';
+		}
+	}
+
+	/**
+	 * Determine if the user is a community user.
+	 * 
+	 * @return boolean
+	 */
+	public function is_community() {
+		$class = get_option( 'patchstack_subscription_class', '');
+		return $class != '' && (int) $class === 0;
+	}
+
+	/**
+	 * Determine if the plugin is connected to the API.
+	 * 
+	 * @return boolean
+	 */
+	public function is_connected() {
+		// Determine if the API client id is set.
+		if ( $this->plugin->client_id == 'PATCHSTACK_CLIENT_ID' && get_option( 'patchstack_clientid', false ) === false ) {
+			return false;
+		}
+
+		// Determine if we have an API token.
+		if ( get_option( 'patchstack_api_token', '' ) == '' ) {
+			return false;
+		}
+
+		// Determine if we have a last license check set.
+		$last_license_check = get_option( 'patchstack_last_license_check', 0 );
+		if ( !empty( $last_license_check ) && time() - $last_license_check >= 604800 ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Determine if the plugin provides protection.
+	 * 
+	 * @return boolean
+	 */
+	public function is_protected() {
+		return get_option( 'patchstack_license_free', false) == 0;
+	}
+
+	/**
 	 * Grab the IP address of the user. Give the override IP header priority.
 	 * If this does not exist, we should always default to REMOTE_ADDR.
 	 *
@@ -288,6 +352,13 @@ class P_Core {
 	 * @return array
 	 */
 	public function encrypt( $message ) {
+		if ( is_null( $message ) ) {
+			return [
+				'cipher' => $message,
+				'nonce' => ''
+			];
+		}
+
 		$enc_type = $this->get_enc_type();
 		$nonce = $this->get_enc_nonce();
 

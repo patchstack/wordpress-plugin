@@ -733,7 +733,7 @@ class P_Firewall extends P_Core {
 	 * @return void
 	 */
 	public function display_error_page( $fid = 1 ) {
-		if ( $fid != 22 && $fid != 23 && $fid != 'login' ) {
+		if ( $fid != 22 && $fid != 23 && $fid != 24 && $fid != 'login' ) {
 			$this->log_hacker( $fid );
 		}
 

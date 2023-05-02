@@ -18,7 +18,7 @@ class P_Hide_Login extends P_Core {
 	public function __construct( $core ) {
 		parent::__construct( $core );
 
-		if ( $this->get_option( 'patchstack_license_free', 0 ) == 1 ) {
+		if ( $this->get_option( 'patchstack_license_free', 0 ) == 1 || $this->is_community() ) {
 			return;
 		}
 
@@ -50,6 +50,10 @@ class P_Hide_Login extends P_Core {
 
 		// Determine if the user is whitelisted.
 		if ( ( stripos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false || $GLOBALS['pagenow'] === 'wp-login.php' || $_SERVER['PHP_SELF'] === '/wp-login.php' ) && ! $this->is_whitelisted() ) {
+			if ( isset( $_REQUEST['action'] ) && in_array( $_REQUEST['action'], ['confirm_admin_email', 'postpass', 'lostpassword', 'retrievepassword', 'resetpass', 'rp', 'register', 'checkemail', 'confirmaction'] ) ) {
+				return;
+			}
+
 			$this->plugin->firewall_base->display_error_page( 'login' );
 		}
 

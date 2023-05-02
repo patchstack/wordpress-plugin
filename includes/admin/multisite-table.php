@@ -55,6 +55,7 @@ class Patchstack_Network_Sites_Table extends WP_List_Table {
 			'url'             => 'URL',
 			'activated'       => 'License Status',
 			'firewall_status' => 'Firewall Status',
+			'migration' 	  => 'Rerun Migration',
 			'edit'            => 'Manage',
 		);
 	}
@@ -83,8 +84,10 @@ class Patchstack_Network_Sites_Table extends WP_List_Table {
 	 * @return Array
 	 */
 	private function table_data() {
+		global $wpdb;
 		$data = array();
 		$free = get_option( 'patchstack_license_free', 0 ) == 1;
+		$nonce = wp_create_nonce( 'patchstack-migration' );
 
 		$blogs_ids = get_sites();
 		foreach ( $blogs_ids as $b ) {
@@ -109,6 +112,18 @@ class Patchstack_Network_Sites_Table extends WP_List_Table {
 			if ( ! isset( $_GET['s'] ) || $match ) {
 				$is_firewall_enabled = get_blog_option( $b->blog_id, 'patchstack_basic_firewall' );
 				$is_activated        = get_blog_option( $b->blog_id, 'patchstack_clientid', '' ) != '';
+				$prefix          	 = $wpdb->get_blog_prefix( $b->blog_id );
+
+				// Determine if the site has any missing migrations.
+				$has_missing = false;
+				if ($is_activated) {
+					foreach( [ 'patchstack_firewall_log', 'patchstack_logic', 'patchstack_event_log' ] as $table ) {
+						$result = $wpdb->get_results("SHOW TABLES LIKE '" . $prefix . $table . "'");
+						if ( !$result ) {
+							$has_missing = true;
+						}
+					}
+				}
 
 				$data[] = array(
 					'id'              => (int) $b->blog_id,
@@ -117,9 +132,16 @@ class Patchstack_Network_Sites_Table extends WP_List_Table {
 					'activated'       => $is_activated ? 'Activated' : 'Deactivated',
 					'firewall_status' => $is_firewall_enabled && ! $free ? 'Enabled' : 'Disabled',
 					'edit'            => $is_activated ? '<a href="' . esc_url( get_admin_url( $b->blog_id ) ) . 'options-general.php?page=patchstack">Edit Settings</a>' : '',
+					'migration'            => '<a href="' . esc_url( add_query_arg(
+						array(
+							'PatchstackNonce' => $nonce,
+							'site'          => $b->blog_id
+						)
+					) ) . '">' . ($has_missing ? 'Run' : 'Rerun') . ' Database Migration</a>',
 				);
 			}
 		}
+
 		return $data;
 	}
 
@@ -138,6 +160,7 @@ class Patchstack_Network_Sites_Table extends WP_List_Table {
 			case 'url':
 			case 'activated':
 			case 'firewall_status':
+			case 'migration':
 			case 'edit':
 				return $item[ $column_name ];
 			default:

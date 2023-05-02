@@ -9,6 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 require_once dirname( __FILE__ ) . '/../../admin/multisite-table.php';
 ?>
 <div class="patchstack-font">
+	<?php
+		if ( isset( $_GET['success'], $_GET['site'] ) && ctype_digit( $_GET['site'] ) ) {
+			$site = get_site( $_GET['site'] );
+			echo '<div class="notice notice-success inline" style="margin: 20px 0 0 0;"><p><strong>The database migration has been re-run for the site: ' . esc_url( $site->siteurl ) . '</strong></p></div>';
+		}
+	?>
 	<form method="GET" style="display: table;">
 		<div class="wrap">
 			<h2>Available Sites</h2>

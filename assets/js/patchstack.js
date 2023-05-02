@@ -23,33 +23,30 @@ window.Patchstack = window.Patchstack || {};
 			e.preventDefault();
 			var postData = {
 				action: 'patchstack_activate_license',
-				clientid: $( '#patchstack_api_client_id' ).val(),
-				secretkey: $( '#patchstack_api_client_secret_key' ).val(),
+				key: $( '#patchstack_api_key' ).val(),
 				PatchstackNonce: PatchstackVars.nonce
 			};
 
-			if ( $.trim( postData.clientid ).length == 0 || $.trim( postData.secretkey ).length == 0) {
-				alert( 'Please enter the site id and secret key.' );
+			if ( $.trim( postData.key ).length == 0 ) {
+				alert( 'Please enter the API key.' );
 				return false;
 			}
 
+			$( '.patchstack-resync' ).hide();
+			$( '#patchstack-activate' ).hide();
+			$( '.patchstack-loading' ).show();
+
 			$.post( PatchstackVars.ajaxurl, postData, function( response ) {
 				if ( response.result == 'error' ) {
+					$( '#patchstack-activate' ).show();
+					$( '.patchstack-loading' ).hide();
 					if ( response.error_message ) {
 						alert( response.error_message );
 					} else {
 						alert( PatchstackVars.error_message );
 					}
 				} else {
-					if (response.response && response.response.free === false) {
-						window.location.reload();
-					} else {
-						$( '.patchstack-license-status' ).text( 'Active' ).css( { color: '#B2D675' } );
-						$( '.patchstack-sub-type' ).text( 'Community (Free) ');
-						$( '.ps-b1, .ps-p1' ).hide();
-						$( '.ps-b3' ).removeClass('patchstack-fullwidth');
-						$( '.ps-b2, .ps-b4, .ps-p2' ).show();
-					}
+					window.location = window.location.href + '&resync=1';
 				}
 			});
 		});

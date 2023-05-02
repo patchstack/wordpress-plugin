@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class P_Multisite extends P_Core {
 
 	/**
-	 * Stores any license activation errors.
+	 * Stores any errors.
 	 *
 	 * @var string
 	 */
@@ -37,6 +37,11 @@ class P_Multisite extends P_Core {
 		// When sites are activated.
 		if ( isset( $_POST['patchstack_do'], $_POST['PatchstackNonce'], $_POST['sites'] ) && $_POST['patchstack_do'] == 'do_licenses' && wp_verify_nonce( $_POST['PatchstackNonce'], 'patchstack-multisite-activation' ) ) {
 			$this->activate_licenses();
+		}
+
+		// When we need to re-run the migration of a specific site.
+		if ( isset( $_GET['site'], $_GET['PatchstackNonce'] ) && wp_verify_nonce( $_GET['PatchstackNonce'], 'patchstack-migration' ) ) {
+			$this->run_migration();
 		}
 	}
 
@@ -147,5 +152,35 @@ class P_Multisite extends P_Core {
 				update_option( $option, $value );
 			}
 		}
+	}
+
+	/**
+	 * Re-run the migration for a specific multisite site.
+	 * 
+	 * @return void
+	 */
+	private function run_migration( ) {
+		// Must be a number.
+		if ( !ctype_digit( $_GET['site'] ) ) {
+			exit;
+		}
+
+		// Site must be valid and exists.
+		$site = get_site( $_GET['site'] );
+		if ( is_null( $site ) ) {
+			exit;
+		}
+
+		// Perform base migration.
+		$this->plugin->activation->migrate( null, $site->id );
+
+		// Perform specific version migrations.
+		$versions = array('3.0.1', '3.0.2');
+		foreach ( $versions as $version ) {
+			$this->plugin->activation->migrate( $version, $site->id );
+		}
+
+		wp_safe_redirect( add_query_arg( [ 'success' => '1', 'site' => $site->id ], remove_query_arg( [ 'PatchstackNonce', 'site' ] ) ) );
+		exit;
 	}
 }

@@ -173,7 +173,7 @@ class P_Admin_General extends P_Core {
 		update_option( 'patchstack_show_settings', 1 );
 
 		// Redirect the user back to the license page.
-		wp_safe_redirect( admin_url( 'admin.php?page=' . $this->plugin->name . '&tab=license' ) );
+		wp_safe_redirect( admin_url( 'admin.php?page=' . $this->plugin->name ) );
 		exit;
 	}
 }

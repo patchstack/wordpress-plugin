@@ -19,7 +19,7 @@ class P_Login extends P_Core {
 	public function __construct( $core ) {
 		parent::__construct( $core );
 
-		if ( $this->get_option( 'patchstack_license_free', 0 ) == 1 ) {
+		if ( $this->get_option( 'patchstack_license_free', 0 ) == 1 || $this->is_community() ) {
 			return;
 		}
 
@@ -191,7 +191,7 @@ class P_Login extends P_Core {
 
 		// Block the user?
 		if ( $num >= $this->get_option( 'patchstack_anti_bruteforce_attempts', 10 ) ) {
-			$this->plugin->firewall_base->display_error_page( 22 );
+			$this->plugin->firewall_base->display_error_page( 24 );
 		}
 	}
 

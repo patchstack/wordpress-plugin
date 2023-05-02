@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Create firewall log table.
-$sql = 'CREATE TABLE ' . $prefix . "patchstack_firewall_log (
+$sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . "patchstack_firewall_log` (
     id mediumint(9) NOT NULL AUTO_INCREMENT,
     ip tinytext NOT NULL,
     flag tinytext NOT NULL,
@@ -28,7 +28,7 @@ $sql = 'CREATE TABLE ' . $prefix . "patchstack_firewall_log (
 dbDelta( $sql );
 
 // Create logic table that will store the firewall rules descriptions.
-$sql = 'CREATE TABLE ' . $prefix . "patchstack_logic (
+$sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . "patchstack_logic` (
     id mediumint(9) NOT NULL,
     cname varchar(20),
     description tinytext,
@@ -134,7 +134,7 @@ if ( ! $result ) {
 		array(
 			'id'          => 109,
 			'cname'       => 'Gone',
-			'description' => 'Trying to access readme files htaccess, htpasswd,errordocs or logs.',
+			'description' => 'Trying to access readme files htaccess, htpasswd, errordocs or logs.',
 		),
 		array(
 			'id'          => 2,
@@ -208,8 +208,8 @@ if ( ! $result ) {
 		),
 		array(
 			'id'          => 19,
-			'cname'       => 'Wpscan',
-			'description' => 'Attack from WPSCAN.',
+			'cname'       => 'readme',
+			'description' => 'Readme.txt Scan.',
 		),
 		array(
 			'id'          => 22,
