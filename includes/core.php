@@ -352,7 +352,7 @@ class P_Core {
 	 * @return array
 	 */
 	public function encrypt( $message ) {
-		if ( is_null( $message ) ) {
+		if ( is_null( $message ) || ! defined( 'AUTH_KEY' ) ) {
 			return [
 				'cipher' => $message,
 				'nonce' => ''
@@ -400,7 +400,7 @@ class P_Core {
 		$enc_type = $this->get_enc_type();
 
 		// If we received an empty nonce, we assume it was never properly encrypted to begin with.
-		if ( $nonce == '' ) {
+		if ( $nonce == '' || ! defined( 'AUTH_KEY' ) ) {
 			return $cipher;
 		}
 

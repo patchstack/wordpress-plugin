@@ -37,7 +37,7 @@ class P_Hardening extends P_Core {
 
 		// When country blocking is set.
 		if ( $this->get_option( 'patchstack_geo_block_enabled', false ) && ! empty( $this->get_option( 'patchstack_geo_block_countries', array() ) ) ) {
-			add_action( 'init', array( $this, 'geo_block_check' ), 10 );
+			add_action( 'init', array( $this, 'geo_block_check' ), ~PHP_INT_MAX );
 		}
 
 		// Apply comment captcha?

@@ -258,7 +258,7 @@ class P_Upload extends P_Core {
 		$software_list[] = array(
 			'sw_type'    => 'php',
 			'sw_name'    => 'PHP',
-			'sw_cur_ver' => substr( phpversion(), 0, 5 ),
+			'sw_cur_ver' => phpversion(),
 			'sw_new_ver' => '',
 		);
 

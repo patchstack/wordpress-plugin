@@ -83,7 +83,7 @@ class P_Admin_Menu extends P_Core {
 		}
 
 		// Only load the selectize CSS file on the firewall settings page.
-		if ( isset( $screen->base ) && stripos( $screen->base, 'patchstack' ) !== false && isset( $_GET['tab'] ) && $_GET['tab'] == 'firewall' ) {
+		if ( isset( $screen->base ) && stripos( $screen->base, 'patchstack' ) !== false ) {
 			wp_enqueue_style( 'patchstack-selectize', $this->plugin->url . 'assets/css/selectize.min.css', array( ), $this->plugin->version );
 		}
 
@@ -120,7 +120,7 @@ class P_Admin_Menu extends P_Core {
 		}
 
 		// Only load the selectize library on the firewall settings page.
-		if ( isset( $screen->base ) && stripos( $screen->base, 'patchstack' ) !== false && isset( $_GET['tab'] ) && $_GET['tab'] == 'firewall' ) {
+		if ( isset( $screen->base ) && stripos( $screen->base, 'patchstack' ) !== false ) {
 			wp_enqueue_script( 'patchstack-selectize', $this->plugin->url . 'assets/js/selectize.min.js', array( ), $this->plugin->version );
 		}
 

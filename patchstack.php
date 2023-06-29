@@ -3,7 +3,7 @@
  * Plugin Name: Patchstack Security
  * Plugin URI:  https://patchstack.com
  * Description: Patchstack identifies security vulnerabilities in WordPress plugins, themes, and core.
- * Version: 2.1.24
+ * Version: 2.1.25
  * Author: Patchstack
  * License: GPLv3
  * Text Domain: patchstack
@@ -58,7 +58,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 		 *
 		 * @var string
 		 */
-		const VERSION = '2.1.24';
+		const VERSION = '2.1.25';
 
 		/**
 		 * API URL of Patchstack to communicate with.
@@ -170,6 +170,11 @@ if ( ! class_exists( 'patchstack' ) ) {
 			$this->url      = plugin_dir_url( __FILE__ );
 			$names          = explode( '/', $this->basename );
 			$this->name     = $names[0];
+
+			// Define WP_CLI command.
+			if ( defined( 'WP_CLI' ) && WP_CLI && method_exists('\WP_CLI', 'add_command')) {
+				\WP_CLI::add_command( 'patchstack activate', [ $this, 'cli_activate' ] );
+			}
 		}
 
 		/**
@@ -214,6 +219,37 @@ if ( ! class_exists( 'patchstack' ) ) {
 		public function activate() {
 			$this->plugin_classes();
 			$this->activation->activate( $this );
+		}
+
+		/**
+		 * Connects the Patchstack plugin to the API with the license id and secret key.
+		 *
+		 * Returns an error if the connection was not successful.
+		 *
+		 * ## OPTIONS
+		 *
+		 * <id>
+		 * : The API client id.
+		 * 
+		 * <secret>
+		 * : The API secret key.
+		 *
+		 * ## EXAMPLES
+		 *
+		 *     $ wp patchstack activate 123456 2b072e8b60402e30d481df351fc08183906254e0
+		 *     Success: The Patchstack plugin has been successfully connected.
+		 */
+		public function cli_activate( $args ) {
+			$id = isset( $args[0] ) ? trim( $args[0] ) : '';
+			$secret = isset( $args[1] ) ? trim( $args[1] ) : '';
+
+			$result = $this->activation->alter_license( $id, $secret, 'activate' );
+			if ( $result['result'] == 'error' ) {
+				\WP_CLI::error( 'The Patchstack plugin could not be connected. Make sure the id and secret key are valid and that api.patchstack.com is not blocked.' );
+				return;
+			}
+
+			\WP_CLI::success( 'The Patchstack plugin has been successfully connected.' );
 		}
 
 		/**
