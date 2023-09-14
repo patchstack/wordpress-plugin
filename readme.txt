@@ -12,7 +12,7 @@ Patchstack identifies security vulnerabilities in WordPress plugins, themes, and
 
 == Description ==
 
-This plugin can be downloaded for free without any paid subscription from the [official WordPress repository](https://wordpress.org/plugins/patchstack/).
+**This plugin can be downloaded for free without any paid subscription from the [official WordPress repository](https://wordpress.org/plugins/patchstack/).**
 
 Patchstack is a powerful tool that helps to identify security vulnerabilities within all your websites' plugins, themes, and WordPress core.
 Patchstack is powered by the WordPress ecosystem's most active community of ethical hackers.
