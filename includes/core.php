@@ -30,73 +30,73 @@ class P_Core {
 	 * 
 	 * @var array
 	 */
-	public $allowed_html = array(
-		'a'        => array(
-			'href'     => array(),
-			'title'    => array(),
-			'target'    => array()
-		),
-		'p'        => array(
-			'style'    => array()
-		),
-		'span'     => array(
-			'style'    => array()
-		),
-		'br'       => array(),
-		'strong'   => array(),
-		'b'        => array(),
-		'i'		   => array(
-			'style'    => array()
-		),
-		'label'	   => array(
-			'for'      => array(),
-			'style'    => array()
-		),
-		'input'    => array(
-			'type' 	   => array(),
-			'class'	   => array(),
-			'name'	   => array(),
-			'id'  	   => array(),
-			'value'    => array(),
-			'checked'  => array(),
-			'style'    => array()
-		),
-		'textarea' => array(
-			'rows'     => array(),
-			'id'       => array(),
-			'name'     => array()
-		),
-		'select'   => array(
-			'name'     => array(),
-			'id'       => array(),
-			'data-selected' => array()
-		),
-		'option'   => array(
-			'value'    => array(),
-			'selected' => array()
-		),
-		'table'    => array(
-			'class'    => array(),
-			'style'    => array()
-		),
-		'thead'    => array(),
-		'th'       => array(
-			'style'    => array()
-		),
-		'tr' 	   => array(),
-		'td' 	   => array(),
-		'div' 	   => array(
-			'class'    => array(),
-			'style'    => array()
-		)
-	);
+	public $allowed_html = [
+		'a'        => [
+			'href'     => [],
+			'title'    => [],
+			'target'    => []
+		],
+		'p'        => [
+			'style'    => []
+		],
+		'span'     => [
+			'style'    => []
+		],
+		'br'       => [],
+		'strong'   => [],
+		'b'        => [],
+		'i'		   => [
+			'style'    => []
+		],
+		'label'	   => [
+			'for'      => [],
+			'style'    => []
+		],
+		'input'    => [
+			'type' 	   => [],
+			'class'	   => [],
+			'name'	   => [],
+			'id'  	   => [],
+			'value'    => [],
+			'checked'  => [],
+			'style'    => []
+		],
+		'textarea' => [
+			'rows'     => [],
+			'id'       => [],
+			'name'     => []
+		],
+		'select'   => [
+			'name'     => [],
+			'id'       => [],
+			'data-selected' => []
+		],
+		'option'   => [
+			'value'    => [],
+			'selected' => []
+		],
+		'table'    => [
+			'class'    => [],
+			'style'    => []
+		],
+		'thead'    => [],
+		'th'       => [
+			'style'    => []
+		],
+		'tr' 	   => [],
+		'td' 	   => [],
+		'div' 	   => [
+			'class'    => [],
+			'style'    => []
+		]
+	];
 
 	/**
 	 * Some of the IP addresses of Patchstack.
 	 * 
 	 * @var array
 	 */
-	public $ips = array(
+	public $ips = [
 		'18.221.197.243',
 		'52.15.237.250',
 		'3.19.3.34',
@@ -111,7 +111,7 @@ class P_Core {
 		'3.133.121.93',
 		'18.219.61.133',
 		'3.14.29.150'
-	);
+	];
 
 	/**
 	 * @param Patchstack $plugin
