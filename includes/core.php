@@ -132,7 +132,7 @@ class P_Core {
 	 */
 	public function get_option( $name, $default = false ) {
 		// We always want to return the site option on the default settings management page.
-		if ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' && is_super_admin() ) {
+		if ( isset( $_GET['page'] ) && $_GET['page'] == 'patchstack-multisite-settings' && function_exists( 'wp_get_current_user' ) && is_super_admin() ) {
 			return get_site_option( $name, $default );
 		}
 
