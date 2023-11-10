@@ -294,11 +294,11 @@ class Extension implements ExtensionInterface
             $ip = isset($whitelistRule->rules, $whitelistRule->rules->ip_address) ? $whitelistRule->rules->ip_address : null;
             if (!is_null($ip)) {
                 if (strpos($ip, '*') !== false) {
-                    $isWhitelistedIp = $this->plugin->ban->check_wildcard_rule($clientIp, $ip);
+                    $isWhitelistedIp = $this->check_wildcard_rule($clientIp, $ip);
                 } elseif (strpos($ip, '-') !== false) {
-                    $isWhitelistedIp = $this->plugin->ban->check_range_rule($clientIp, $ip);
+                    $isWhitelistedIp = $this->check_range_rule($clientIp, $ip);
                 } elseif (strpos($ip, '/') !== false) {
-                    $isWhitelistedIp = $this->plugin->ban->check_subnet_mask_rule($clientIp, $ip);
+                    $isWhitelistedIp = $this->check_subnet_mask_rule($clientIp, $ip);
                 } elseif ($clientIp == $ip) {
                     $isWhitelistedIp = true;
                 } else {
@@ -370,4 +370,59 @@ class Extension implements ExtensionInterface
     {
         return isset($_FILES) && count($_FILES) > 0;
     }
+
+	/**
+	 * CIDR notation IP block check.
+	 *
+	 * @param string $ip The IP address of the user.
+	 * @param string $range The range to check.
+	 * @return boolean Whether or not the IP is in the range.
+	 */
+	public function check_subnet_mask_rule( $ip, $range )
+    {
+		list($range, $netmask) = explode( '/', $range, 2 );
+		$range_decimal         = ip2long( $range );
+		$ip_decimal            = ip2long( $ip );
+		$wildcard_decimal      = pow( 2, ( 32 - $netmask ) ) - 1;
+		$netmask_decimal       = ~ $wildcard_decimal;
+		return ( ( $ip_decimal & $netmask_decimal ) == ( $range_decimal & $netmask_decimal ) );
+	}
+
+	/**
+	 * Wildcard IP block check.
+	 *
+	 * @param string $ip The IP address of the user.
+	 * @param string $rule The wildcard range to check against.
+	 * @return boolean Whether or not the IP is in the wilcard range.
+	 */
+	public function check_wildcard_rule( $ip, $rule )
+    {
+		$match = explode( '*', $rule );
+		$match = $match[0];
+		return ( substr( $ip, 0, strlen( $match ) ) == $match );
+	}
+
+	/**
+	 * IP range block check.
+	 *
+	 * @param string|array $ip The IP address of the user.
+	 * @param string       $rule The range to check against.
+	 * @return boolean Whether or not the IP is in the range.
+	 */
+	public function check_range_rule( $ip, $rule )
+    {
+		// Check if client has multiple IPs
+		if ( is_array( $ip ) ) {
+			$ip = $ip[0];
+		}
+
+		$first_ip  = explode( '-', $rule );
+		$second_ip = explode( '-', $rule );
+
+		$start_ip   = ip2long( $first_ip[0] );
+		$end_ip     = ip2long( $second_ip[1] );
+		$request_ip = ip2long( $ip );
+
+		return ( $request_ip >= $start_ip && $request_ip <= $end_ip );
+	}
 }
