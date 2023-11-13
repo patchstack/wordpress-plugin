@@ -12,17 +12,14 @@ $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . "patchstack_firewall_log` (
     flag tinytext NOT NULL,
     fid mediumint(4),
     request_uri tinytext,
-    referer tinytext,
     user_agent tinytext,
-    protocol tinytext,
     method tinytext,
-    query_string tinytext,
-    query_vars tinytext,
     post_data LONGTEXT,
     log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     apply_ban INT NOT NULL DEFAULT '1',
     block_type VARCHAR(255) NOT NULL DEFAULT '',
     block_params VARCHAR(255) NOT NULL DEFAULT '',
+	PRIMARY KEY (id),
     UNIQUE KEY id (id)
 ) $charset_collate;";
 dbDelta( $sql );
@@ -33,6 +30,7 @@ $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . "patchstack_logic` (
     cname varchar(20),
     description tinytext,
     log_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (id),
     UNIQUE KEY id (id)
 ) $charset_collate;";
 dbDelta( $sql );
@@ -48,7 +46,8 @@ $sql = 'CREATE TABLE IF NOT EXISTS `' . $prefix . "patchstack_event_log` (
     object_name text  NULL,
     action tinytext NULL,
     date datetime  NULL,
-    PRIMARY KEY  (id)
+    PRIMARY KEY  (id),
+    UNIQUE KEY id (id)
     ) $charset_collate;";
 dbDelta( $sql );
 

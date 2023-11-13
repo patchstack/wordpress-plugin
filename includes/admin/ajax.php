@@ -45,7 +45,7 @@ class P_Admin_Ajax extends P_Core {
 		global $wpdb;
 		$entries = $wpdb->get_results(
 			$wpdb->prepare(
-				"SELECT a.id, a.ip, a.flag, a.method, a.log_date, case when a.referer IS NULL or a.referer = '' then a.request_uri else a.referer end as referer, a.fid, b.description 
+				"SELECT a.id, a.ip, a.flag, a.method, a.log_date, a.request_uri as referer, a.fid, b.description 
 				FROM " . $wpdb->prefix . 'patchstack_firewall_log AS a
 				LEFT JOIN ' . $wpdb->prefix . 'patchstack_logic AS b ON b.id = a.fid
 				ORDER BY a.id DESC

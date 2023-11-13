@@ -587,11 +587,11 @@ class Processor
             if (!is_null($ip)) {
                 $matched_ip = false;
                 if (strpos($ip, '*') !== false) {
-                    $matched_ip = $this->plugin->ban->check_wildcard_rule($client_ip, $ip);
+                    $matched_ip = $this->extension->check_wildcard_rule($client_ip, $ip);
                 } elseif (strpos($ip, '-') !== false) {
-                    $matched_ip = $this->plugin->ban->check_range_rule($client_ip, $ip);
+                    $matched_ip = $this->extension->check_range_rule($client_ip, $ip);
                 } elseif (strpos($ip, '/') !== false) {
-                    $matched_ip = $this->plugin->ban->check_subnet_mask_rule($client_ip, $ip);
+                    $matched_ip = $this->extension->check_subnet_mask_rule($client_ip, $ip);
                 } elseif ($client_ip == $ip) {
                     $matched_ip = true;
                 }
