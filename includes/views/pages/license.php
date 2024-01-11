@@ -12,7 +12,7 @@ $planClass = get_option( 'patchstack_subscription_class', '');
 $managed = get_option( 'patchstack_managed', false );
 $site_id = get_option( 'patchstack_site_id', 0 );
 $app_url = $site_id != 0 ? 'https://app.patchstack.com/app/' . $site_id . '/"' : 'https://app.patchstack.com/apps/overview';
-if ( isset( $_GET['activated'] ) && $status ) {
+if ( isset( $_GET['ps_activated'] ) && $status ) {
 	echo "<script>window.location = 'admin.php?page=patchstack&tab=license&active=1';</script>";
 }
 
