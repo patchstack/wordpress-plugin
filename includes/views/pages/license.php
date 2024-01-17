@@ -46,7 +46,7 @@ if (!$show_settings) {
 			<div class="patchstack-protection" <?php echo $this->is_protected() || $planClass > 0 || $managed ? 'style="display: none;"' : ''; ?>>
 				<span>Protection disabled</span>
 				<a href="<?php echo $app_url; ?>" target="_blank" class="button-primary">
-					Activate for $9 / mo
+					Activate for $5 / mo
 				</a>
 			</div>
 
