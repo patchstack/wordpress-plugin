@@ -349,6 +349,11 @@ class P_Activation extends P_Core {
 	 * @return array
 	 */
 	public function alter_license( $id, $secret, $action ) {
+		// Set the default option values if calling through CLI.
+		if ( defined( 'WP_CLI' ) && WP_CLI) {
+			$this->plugin->admin_options->settings_init();
+		}
+
 		// Store current keys in tmp variable so in case it fails, we can set it back.
 		$tmp_id  = get_option( 'patchstack_clientid' );
 		$tmp_key = $this->get_secret_key();
@@ -365,6 +370,7 @@ class P_Activation extends P_Core {
 			if ( ! $api_result ) {
 				update_option( 'patchstack_clientid', $tmp_id );
 				$this->set_secret_key( $tmp_key );
+
 				return [
 					'result'  => 'error',
 					'message' => 'Cannot activate license!',
@@ -388,6 +394,7 @@ class P_Activation extends P_Core {
 				$this->plugin->api->update_url( [ 'plugin_url' => get_option( 'siteurl' ) ] );
 				$this->plugin->api->ping();
 			}
+
 			return [
 				'result'  => 'success',
 				'message' => 'License activated!',
@@ -398,6 +405,7 @@ class P_Activation extends P_Core {
 		if ( $action == 'deactivate' ) {
 			update_option( 'patchstack_api_token', '' );
 			update_option( 'patchstack_license_activated', '0' );
+	
 			return [
 				'result'  => 'success',
 				'message' => 'License deactivated!',

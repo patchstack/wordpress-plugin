@@ -41,26 +41,27 @@ class P_Listener extends P_Core {
 	public function handleRequest() {
 		// Loop through all possible actions.
 		foreach ( [
-			'webarx_remote_users'      => 'listUsers',
-			'webarx_firewall_switch'   => 'switchFirewallStatus',
-			'webarx_wordpress_upgrade' => 'wordpressCoreUpgrade',
-			'webarx_theme_upgrade'     => 'themeUpgrade',
-			'webarx_plugins_upgrade'   => 'pluginsUpgrade',
-			'webarx_plugins_toggle'    => 'pluginsToggle',
-			'webarx_plugins_delete'    => 'pluginsDelete',
-			'webarx_get_options'       => 'getAvailableOptions',
-			'webarx_set_options'       => 'saveOptions',
-			'webarx_refresh_rules'     => 'refreshRules',
-			'webarx_get_firewall_bans' => 'getFirewallBans',
-			'webarx_firewall_unban_ip' => 'unbanFirewallIp',
-			'webarx_upload_software'   => 'uploadSoftware',
-			'webarx_upload_logs'       => 'uploadLogs',
-			'webarx_send_ping'         => 'sendPing',
-			'webarx_login_bans'        => 'getLoginBans',
-			'webarx_unban_login'       => 'unbanLogin',
-			'webarx_debug_info'        => 'debugInfo',
-			'webarx_set_ip_header'	   => 'setIpHeader',
-			'webarx_refresh_license'   => 'refreshLicense'
+			'webarx_remote_users'       => 'listUsers',
+			'webarx_firewall_switch'    => 'switchFirewallStatus',
+			'webarx_wordpress_upgrade'  => 'wordpressCoreUpgrade',
+			'webarx_theme_upgrade'      => 'themeUpgrade',
+			'webarx_plugins_upgrade'    => 'pluginsUpgrade',
+			'webarx_plugins_toggle'     => 'pluginsToggle',
+			'webarx_plugins_delete'     => 'pluginsDelete',
+			'webarx_get_options'        => 'getAvailableOptions',
+			'webarx_set_options'        => 'saveOptions',
+			'webarx_refresh_rules'      => 'refreshRules',
+			'webarx_get_firewall_bans'  => 'getFirewallBans',
+			'webarx_firewall_unban_ip'  => 'unbanFirewallIp',
+			'webarx_firewall_unban_all' => 'unbanFirewallAll',
+			'webarx_upload_software'    => 'uploadSoftware',
+			'webarx_upload_logs'        => 'uploadLogs',
+			'webarx_send_ping'          => 'sendPing',
+			'webarx_login_bans'         => 'getLoginBans',
+			'webarx_unban_login'        => 'unbanLogin',
+			'webarx_debug_info'         => 'debugInfo',
+			'webarx_set_ip_header'	    => 'setIpHeader',
+			'webarx_refresh_license'    => 'refreshLicense'
 		] as $key => $action ) {
 			// Special case for Patchstack plugin upgrade.
 			if ( isset( $_POST[ $key ] ) ) {
@@ -507,9 +508,9 @@ class P_Listener extends P_Core {
 	/**
 	 * Get a list of IP addresses that are currently banned by the firewall.
 	 *
-	 * @return void
+	 * @return void|array
 	 */
-	private function getFirewallBans() {
+	private function getFirewallBans($return = false) {
 		// Calculate block time.
 		$minutes = (int) $this->get_option( 'patchstack_autoblock_minutes', 30 );
 		$timeout = (int) $this->get_option( 'patchstack_autoblock_blocktime', 60 );
@@ -532,6 +533,10 @@ class P_Listener extends P_Core {
 			}
 		}
 
+		if ($return) {
+			return $out;
+		}
+
 		wp_send_json( $out );
 	}
 
@@ -548,6 +553,28 @@ class P_Listener extends P_Core {
 		global $wpdb;
 		$wpdb->query( $wpdb->prepare( 'UPDATE ' . $wpdb->prefix . 'patchstack_firewall_log SET apply_ban = 0 WHERE ip = %s', [ $_POST['webarx_ip'] ] ) );
 		$this->returnResults( null, 'The IP has been unbanned.' );
+	}
+
+	/**
+	 * Unban a specific IP address from the firewall.
+	 *
+	 * @return void
+	 */
+	private function unbanFirewallAll() {
+		global $wpdb;
+
+		// Get all banned IP addresses.
+		$ips = $this->getFirewallBans(true);
+		if (count($ips) == 0) {
+			$this->returnResults( null, 'There are no IP addresses to unban.' );
+		}
+
+		// Unban all IP addresses.
+		foreach ($ips as $ip) {
+			$wpdb->query( $wpdb->prepare( 'UPDATE ' . $wpdb->prefix . 'patchstack_firewall_log SET apply_ban = 0 WHERE ip = %s', [ $ip ] ) );
+		}
+		
+		$this->returnResults( null, 'All IP addresses has been unbanned.' );
 	}
 
 	/**
