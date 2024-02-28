@@ -385,6 +385,7 @@ class P_Activation extends P_Core {
 			if ( ! empty( $token ) ) {
 				do_action( 'patchstack_send_software_data' );
 				if ( get_option( 'patchstack_license_free', 0 ) != 1 ) {
+					update_option( 'patchstack_basic_firewall', 1 );
 					do_action( 'patchstack_post_firewall_rules' );
 					do_action( 'patchstack_post_dynamic_firewall_rules' );
 					$this->header();

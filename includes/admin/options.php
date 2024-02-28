@@ -118,6 +118,7 @@ class P_Admin_Options extends P_Core {
 		// General options.
 		'patchstack_blackhole_log'                      => '',
 		'patchstack_software_data_hash'                 => '',
+		'patchstack_software_upload_attempted'			=> false,
 		'patchstack_firewall_htaccess_hash'             => '',
 		'patchstack_license_expiry'						=> '',
 		'patchstack_clientid'                           => false,

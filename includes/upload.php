@@ -21,7 +21,7 @@ class P_Upload extends P_Core {
 		parent::__construct( $core );
 
 		// In case the software has never been synchronized, force it.
-		if ( ! get_option( 'patchstack_software_data_hash', false ) ) {
+		if ( ! get_option( 'patchstack_software_data_hash', false ) && ! get_option( 'patchstack_software_upload_attempted', false ) ) {
 			$this->upload_software();
 		}
 
@@ -50,9 +50,12 @@ class P_Upload extends P_Core {
 		$hash = sha1( json_encode( $data ) );
 
 		// Do not sync for no reason.
-		if ( ! defined( 'DOING_CRON' ) && ! isset( $_POST['webarx_secret'] ) && get_option( 'patchstack_software_data_hash', false ) === $hash && ! is_admin() ) {
+		if ( ! defined( 'DOING_CRON' ) && ! isset( $_POST['webarx_secret'] ) && get_option( 'patchstack_software_data_hash', false ) === $hash && ! is_admin() && ! defined( 'WP_CLI ' ) ) {
 			return;
 		}
+
+		// Make sure to not keep calling this function.
+		update_option( 'patchstack_software_upload_attempted', true );
 
 		// Synchronize the software list with the API.
 		$results = $this->plugin->api->upload_software( [ 'software' => json_encode( $data ) ] );
