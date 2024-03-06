@@ -31,6 +31,15 @@ class P_Listener extends P_Core {
 				$this->setIpHeader();
 			}
 		}
+
+		// License (re)activation.
+		if ( isset( $_POST['patchstack_ra_action'] ) ) {
+			$aas = get_option( 'patchstack_activation_secret', '' );
+			$aat = get_option( 'patchstack_activation_time', '' );
+			if ( ! empty( $aas ) && hash_equals( $aas, $_POST['patchstack_ra_action'] ) && ! empty ( $aat ) && ( time() - $aat ) < 1800 ) {
+				$this->setLicenseInfo();
+			}
+		}
 	}
 
 	/**
@@ -740,11 +749,31 @@ class P_Listener extends P_Core {
 	 * 
 	 * @return void
 	 */
-	private function refreshLicense (){
+	private function refreshLicense () {
 		do_action( 'update_license_status' );
 		do_action( 'patchstack_send_software_data' );
 		do_action( 'patchstack_post_dynamic_firewall_rules' );
 		
 		wp_send_json( array( 'success' => true ) );
+	}
+
+	/**
+	 * Set license information.
+	 * 
+	 * @return void
+	 */
+	private function setLicenseInfo () {
+		if ( ! isset( $_POST['id'], $_POST['secret'] ) ) {
+			wp_send_json( [ 'success' => false, 'message' => 'Missing required parameters.' ] );
+		}
+
+		$result = $this->plugin->activation->alter_license( $_POST['id'], $_POST['secret'], 'activate' );
+		if ( $result['result'] == 'error' ) {
+			wp_send_json( [ 'success' => false, 'message' => 'The license could not be activated.' ] );
+		}
+
+		update_option( 'patchstack_activation_secret', '' );
+		update_option( 'patchstack_activation_time', '' );
+		wp_send_json( [ 'success' => true ] );
 	}
 }

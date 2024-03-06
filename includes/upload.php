@@ -98,53 +98,69 @@ class P_Upload extends P_Core {
 	 */
 	public function upload_firewall_logs() {
 		global $wpdb;
-		$lastid = get_option( 'patchstack_firewall_log_lastid', 0 );
-		$items  = $wpdb->get_results( $wpdb->prepare( 'SELECT ip, log_date, request_uri, user_agent, fid, method, post_data FROM ' . $wpdb->prefix . 'patchstack_firewall_log WHERE id > %d ORDER BY id', $lastid ) );
 
-		// No need to synchronize if there are no new logs present.
-		if ( $wpdb->num_rows == 0 ) {
-			return;
-		}
+		// Attempt to fetch data, if any.
+		$lastId = get_option( 'patchstack_firewall_log_lastid', 0 );
+		$successId = $lastId;
+		while ( true ) {
+			// Pull the data from the database, in batches of 100.
+			$items = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, ip, log_date, request_uri, user_agent, fid, method, post_data FROM ' . $wpdb->prefix . 'patchstack_firewall_log WHERE id > %d ORDER BY id LIMIT 0,100',
+					$lastId
+				)
+			);
 
-		// Construct the array to be uploaded to our API.
-		$logs = [];
-		foreach ( $items as $item ) {
+			// No need to continue if we have no data.
+			if ( $wpdb->num_rows == 0 ) {
+				break;
+			}
+	
+			// Construct the array to be uploaded to our API.
+			$logs = [];
+			foreach ( $items as $item ) {
+	
+				// Entries that we don't want to store on the API side.
+				if ( stripos( $item->request_uri, 'wp-comments-post' ) !== false ) {
+					continue;
+				}
+	
+				// Push to entries to be uploaded.
+				$logs[] = [
+					'ip'          => $item->ip,
+					'fid'         => $item->fid,
+					'request_uri' => $item->request_uri,
+					'user_agent'  => $item->user_agent,
+					'method'      => $item->method,
+					'log_date'    => $item->log_date,
+					'post_data'   => $item->post_data,
+				];
 
-			// Entries that we don't want to store on the API side.
-			if ( stripos( $item->request_uri, 'wp-comments-post' ) !== false ) {
-				continue;
+				$lastId = $item->id;
+			}
+	
+			// JSON encode the logs and upload.
+			$logs = json_encode( $logs );
+			$results = $this->plugin->api->upload_firewall_logs(
+				[
+					'logs' => $logs,
+					'type' => 'firewall',
+				]
+			);
+
+			if ( isset( $results['errors'] ) ) {
+				update_option( 'patchstack_firewall_log_lastid', $successId );
+				break;
 			}
 
-			// Push to entries to be uploaded.
-			$logs[] = [
-				'ip'          => $item->ip,
-				'fid'         => $item->fid,
-				'request_uri' => $item->request_uri,
-				'user_agent'  => $item->user_agent,
-				'method'      => $item->method,
-				'log_date'    => $item->log_date,
-				'post_data'   => $item->post_data,
-			];
+			$successId = $lastId;
 		}
 
-		// JSON encode the logs and upload.
-		$logs    = json_encode( $logs );
-		$results = $this->plugin->api->upload_firewall_logs(
-			[
-				'logs' => $logs,
-				'type' => 'firewall',
-			]
-		);
-		if ( isset( $results['errors'] ) ) {
-			return;
-		}
+		// Set lastid to 0.
+		update_option( 'patchstack_firewall_log_lastid', 0 );
 
-		// Get the most recent id of the logs.
-		$lastid = $wpdb->get_var( 'SELECT id FROM ' . $wpdb->prefix . 'patchstack_firewall_log ORDER BY id DESC LIMIT 0, 1' );
-		update_option( 'patchstack_firewall_log_lastid', $lastid );
-
-		// Delete logs that are older than 2 weeks.
-		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_firewall_log WHERE log_date < DATE_SUB(NOW(), INTERVAL 14 DAY)' );
+		// Delete the logs.
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_firewall_log' );
 	}
 
 	/**
@@ -161,26 +177,43 @@ class P_Upload extends P_Core {
 			$where = ' ';
 		}
 
-		// Do we have data to upload?
-		$lastid = get_option( 'patchstack_eventlog_lastid', 0 );
-		$items  = $wpdb->get_results( $wpdb->prepare( 'SELECT author, ip, object, object_id, object_name, action, date FROM ' . $wpdb->prefix . 'patchstack_event_log WHERE id > %d' . $where . 'ORDER BY id', [ $lastid ] ) );
-		if ( $wpdb->num_rows == 0 ) {
-			return;
+		// Attempt to fetch data, if any.
+		$lastId = get_option( 'patchstack_eventlog_lastid', 0 );
+		$successId = $lastId;
+		while ( true ) {
+			// Pull the data from the database, in batches of 100.
+			$items = $wpdb->get_results(
+				$wpdb->prepare(
+					'SELECT id, author, ip, object, object_id, object_name, action, date FROM ' . $wpdb->prefix . 'patchstack_event_log WHERE id > %d' . $where . 'ORDER BY id LIMIT 0,100',
+					$lastId
+				),
+				ARRAY_A
+			);
+
+			// No need to continue if we have no data.
+			if ( $wpdb->num_rows == 0 ) {
+				break;
+			}
+
+			// Get the last ID in the result set.
+			$lastId = $items[count($items) - 1]['id'];
+
+			// Send to the API.
+			$logs = json_encode( $items );
+			$results = $this->plugin->api->upload_activity_logs( [ 'logs' => $logs ] );
+			if ( isset( $results['errors'] ) ) {
+				update_option( 'patchstack_eventlog_lastid', $successId );
+				break;
+			}
+
+			$successId = $lastId;
 		}
 
-		// Send to the API.
-		$logs    = json_encode( $items );
-		$results = $this->plugin->api->upload_activity_logs( [ 'logs' => $logs ] );
-		if ( isset( $results['errors'] ) ) {
-			return;
-		}
+		// Set lastid to 0.
+		update_option( 'patchstack_eventlog_lastid', 0 );
 
-		// Get the most recent id of the logs.
-		$lastid = $wpdb->get_var( 'SELECT id FROM ' . $wpdb->prefix . 'patchstack_event_log ORDER BY id DESC LIMIT 0, 1' );
-		update_option( 'patchstack_eventlog_lastid', $lastid );
-
-		// Delete logs that are older than 2 weeks.
-		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_event_log WHERE date < DATE_SUB(NOW(), INTERVAL 14 DAY)' );
+		// Delete the logs.
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_event_log' );
 	}
 
 	/**
