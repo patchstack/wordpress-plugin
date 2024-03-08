@@ -99,10 +99,19 @@ class P_Upload extends P_Core {
 	public function upload_firewall_logs() {
 		global $wpdb;
 
+		// Do not process if we are already processing a previous batch.
+		if ( get_option( 'patchstack_firewall_log_processing', false ) ) {
+			return;
+		}
+
+		update_option( 'patchstack_firewall_log_processing', true );
+
 		// Attempt to fetch data, if any.
 		$lastId = get_option( 'patchstack_firewall_log_lastid', 0 );
 		$successId = $lastId;
-		while ( true ) {
+
+		// Do a maximum of 500 log entries per cronjob.
+		for ( $i = 0; $i <= 4; $i++ ) {
 			// Pull the data from the database, in batches of 100.
 			$items = $wpdb->get_results(
 				$wpdb->prepare(
@@ -113,6 +122,7 @@ class P_Upload extends P_Core {
 
 			// No need to continue if we have no data.
 			if ( $wpdb->num_rows == 0 ) {
+				update_option( 'patchstack_firewall_log_lastid', 0 );
 				break;
 			}
 	
@@ -154,13 +164,14 @@ class P_Upload extends P_Core {
 			}
 
 			$successId = $lastId;
+			update_option( 'patchstack_firewall_log_lastid', $successId );
 		}
 
-		// Set lastid to 0.
-		update_option( 'patchstack_firewall_log_lastid', 0 );
-
 		// Delete the logs.
-		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_firewall_log' );
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_firewall_log WHERE id <= ' . (int) $successId );
+
+		// No longer processing.
+		update_option( 'patchstack_firewall_log_processing', false );
 	}
 
 	/**
@@ -171,6 +182,13 @@ class P_Upload extends P_Core {
 	public function upload_activity_logs() {
 		global $wpdb;
 
+		// Do not process if we are already processing a previous batch.
+		if ( get_option( 'patchstack_eventlog_processing', false ) ) {
+			return;
+		}
+
+		update_option( 'patchstack_eventlog_processing', true );
+
 		// Determine if we should upload failed logins to the app.
 		$where = " AND action != 'failed login' ";
 		if ( $this->get_option( 'patchstack_activity_log_failed_logins_db', 0 ) == 1 ) {
@@ -180,7 +198,9 @@ class P_Upload extends P_Core {
 		// Attempt to fetch data, if any.
 		$lastId = get_option( 'patchstack_eventlog_lastid', 0 );
 		$successId = $lastId;
-		while ( true ) {
+
+		// Do a maximum of 500 log entries per cronjob.
+		for ( $i = 0; $i <= 4; $i++ ) {
 			// Pull the data from the database, in batches of 100.
 			$items = $wpdb->get_results(
 				$wpdb->prepare(
@@ -192,6 +212,7 @@ class P_Upload extends P_Core {
 
 			// No need to continue if we have no data.
 			if ( $wpdb->num_rows == 0 ) {
+				update_option( 'patchstack_eventlog_lastid', 0 );
 				break;
 			}
 
@@ -207,13 +228,14 @@ class P_Upload extends P_Core {
 			}
 
 			$successId = $lastId;
+			update_option( 'patchstack_eventlog_lastid', $successId );
 		}
 
-		// Set lastid to 0.
-		update_option( 'patchstack_eventlog_lastid', 0 );
-
 		// Delete the logs.
-		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_event_log' );
+		$wpdb->query( 'DELETE FROM ' . $wpdb->prefix . 'patchstack_event_log WHERE id <= ' . (int) $successId );
+
+		// No longer processing.
+		update_option( 'patchstack_eventlog_processing', false );
 	}
 
 	/**
