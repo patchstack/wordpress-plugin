@@ -559,12 +559,12 @@ class P_Admin_Options extends P_Core {
 	}
 
 	public function patchstack_captcha_public_key_input() {
-		$string1 = __( '<br /><br />Enter the reCAPTCHA site key here.<br />Click <a href="https://docs.patchstack.com/discuss/62e286cf7040390013b73bf7" target="_blank">here</a> for a guide on how to get the site / secret key.', 'patchstack' );
+		$string1 = __( '<br /><br />Enter the reCAPTCHA site key here.<br />Click <a href="https://docs.patchstack.com/faq-troubleshooting/integrations/how-to-get-the-site-key-and-secret-key-for-the-recaptcha-feature/" target="_blank">here</a> for a guide on how to get the site / secret key.', 'patchstack' );
 		echo wp_kses( '<input style="display:none;" type="text" name="patchstack_captcha_public_key" id="patchstack_captcha_public_key" value="' . esc_attr( $this->get_option( 'patchstack_captcha_public_key', '' ) ) . '"/><input style="display:none;" type="text" name="patchstack_captcha_public_key_v3" id="patchstack_captcha_public_key_v3" value="' . esc_attr( $this->get_option( 'patchstack_captcha_public_key_v3', '' ) ) . '"/><input style="display:none;" type="text" name="patchstack_captcha_public_key_v3_new" id="patchstack_captcha_public_key_v3_new" value="' . esc_attr( $this->get_option( 'patchstack_captcha_public_key_v3_new', '' ) ) . '"/><label for="patchstack_captcha_public_key"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 
 	public function patchstack_captcha_private_key_input() {
-		$string1 = __( '<br /><br />Enter the reCAPTCHA secret key here.<br />Click <a href="https://docs.patchstack.com/discuss/62e286cf7040390013b73bf7" target="_blank">here</a> for a guide on how to get the site / secret key.', 'patchstack' );
+		$string1 = __( '<br /><br />Enter the reCAPTCHA secret key here.<br />Click <a href="https://docs.patchstack.com/faq-troubleshooting/integrations/how-to-get-the-site-key-and-secret-key-for-the-recaptcha-feature/" target="_blank">here</a> for a guide on how to get the site / secret key.', 'patchstack' );
 		echo wp_kses( '<input style="display:none;" type="text" name="patchstack_captcha_private_key" id="patchstack_captcha_private_key" value="' . esc_attr( $this->get_option( 'patchstack_captcha_private_key', '' ) ) . '"/><input style="display:none;" type="text" name="patchstack_captcha_private_key_v3" id="patchstack_captcha_private_key_v3" value="' . esc_attr( $this->get_option( 'patchstack_captcha_private_key_v3', '' ) ) . '"/><input style="display:none;" type="text" name="patchstack_captcha_private_key_v3_new" id="patchstack_captcha_private_key_v3_new" value="' . esc_attr( $this->get_option( 'patchstack_captcha_private_key_v3_new', '' ) ) . '"/><label for="patchstack_captcha_private_key"><i>' . $string1 . '</i></label>' , $this->allowed_html );
 	}
 

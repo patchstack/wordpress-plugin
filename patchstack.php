@@ -4,7 +4,7 @@
  * Plugin URI:  https://patchstack.com/?utm_medium=wp&utm_source=dashboard&utm_campaign=patchstack%20plugin
  * Author URI: https://patchstack.com/?utm_medium=wp&utm_source=dashboard&utm_campaign=patchstack%20plugin
  * Description: Patchstack identifies security vulnerabilities in WordPress plugins, themes, and core.
- * Version: 2.2.11
+ * Version: 2.2.12
  * Author: Patchstack
  * License: GPLv3
  * Text Domain: patchstack
@@ -59,7 +59,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 		 *
 		 * @var string
 		 */
-		const VERSION = '2.2.11';
+		const VERSION = '2.2.12';
 
 		/**
 		 * API URL of Patchstack to communicate with.
@@ -258,7 +258,7 @@ if ( ! class_exists( 'patchstack' ) ) {
 
 			$result = $this->activation->alter_license( $id, $secret, 'activate' );
 			if ( $result['result'] == 'error' ) {
-				\WP_CLI::error( 'The Patchstack plugin could not be connected. Make sure the id and secret key are valid and that api.patchstack.com is not blocked.' );
+				\WP_CLI::error( "The Patchstack plugin could not be connected. Make sure the id and secret key are valid and that api.patchstack.com is not blocked. Additional information:\n" . $result['body'] );
 				return;
 			}
 

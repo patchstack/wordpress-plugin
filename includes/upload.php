@@ -74,7 +74,7 @@ class P_Upload extends P_Core {
 			if ( isset( $results['vulnerable'] ) && count( $results['vulnerable'] ) > 0 ) {
 				$prev = get_site_option( 'patchstack_latest_vulnerable', [] );
 				foreach ( $results['vulnerable'] as $vuln ) {
-					if ( ! in_array ( $vuln, $prev ) ) {
+					if ( is_array( $prev ) && ! in_array ( $vuln, $prev ) ) {
 						do_action( 'patchstack_post_dynamic_firewall_rules' );
 						break;
 					}
@@ -99,6 +99,11 @@ class P_Upload extends P_Core {
 	public function upload_firewall_logs() {
 		global $wpdb;
 
+		// Do not execute upload action on free sites.
+		if ( ! $this->license_is_active() || $this->get_option( 'patchstack_license_free', 0 ) == 1 ) {
+			return;
+		}
+
 		// Do not process if we are already processing a previous batch.
 		if ( get_option( 'patchstack_firewall_log_processing', false ) ) {
 			return;
@@ -111,7 +116,7 @@ class P_Upload extends P_Core {
 		$successId = $lastId;
 
 		// Do a maximum of 500 log entries per cronjob.
-		for ( $i = 0; $i <= 4; $i++ ) {
+		for ($i = 0; $i <= 4; $i++) {
 			// Pull the data from the database, in batches of 100.
 			$items = $wpdb->get_results(
 				$wpdb->prepare(
@@ -182,6 +187,11 @@ class P_Upload extends P_Core {
 	public function upload_activity_logs() {
 		global $wpdb;
 
+		// Do not execute upload action on free sites.
+		if ( ! $this->license_is_active() || $this->get_option( 'patchstack_license_free', 0 ) == 1 ) {
+			return;
+		}
+
 		// Do not process if we are already processing a previous batch.
 		if ( get_option( 'patchstack_eventlog_processing', false ) ) {
 			return;
@@ -199,8 +209,8 @@ class P_Upload extends P_Core {
 		$lastId = get_option( 'patchstack_eventlog_lastid', 0 );
 		$successId = $lastId;
 
-		// Do a maximum of 500 log entries per cronjob.
-		for ( $i = 0; $i <= 4; $i++ ) {
+		// Do a maximum of several hundred log entries per cronjob.
+		for ($i = 0; $i <= 4; $i++) {
 			// Pull the data from the database, in batches of 100.
 			$items = $wpdb->get_results(
 				$wpdb->prepare(

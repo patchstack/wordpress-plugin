@@ -4,8 +4,8 @@ Tags: security, wordpress security, plugin security, theme security, virtual pat
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Requires at least: 4.4
-Tested up to: 6.4
-Stable tag: 2.2.11
+Tested up to: 6.5
+Stable tag: 2.2.12
 Requires PHP: 5.6
 
 Patchstack automatically identifies & mitigates security vulnerabilities in WordPress plugins, themes, and core.
@@ -37,8 +37,8 @@ https://www.youtube.com/watch?v=LL3Yy15rJ3g
 
 **Important Resources**
 
-* [Support](https://docs.patchstack.com/docs)
-* [Changelog](https://docs.patchstack.com/docs/plugin-changelog)
+* [Support](https://docs.patchstack.com)
+* [Changelog](https://docs.patchstack.com/changelog/plugin-changelog/)
 * [Facebook Community](https://www.facebook.com/groups/patchstackcommunity)
 * [Vulnerability news blog post](https://patchstack.com/articles/wordpress-vulnerability)
 * [Patchstack vulnerability database](https://patchstack.com/database)
@@ -164,4 +164,4 @@ You can report any security bugs found in the source code of this plugin through
 
 == Changelog ==
 
-To view the changelog of the Patchstack plugin, please go to [here](https://docs.patchstack.com/docs/plugin-changelog).
+To view the changelog of the Patchstack plugin, please go to [here](https://docs.patchstack.com/changelog/plugin-changelog/).

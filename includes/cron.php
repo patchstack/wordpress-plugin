@@ -99,16 +99,20 @@ class P_Cron extends P_Core {
 		];
 
 		// Schedule the events if they are not scheduled yet.
-		foreach ( $free as $event => $interval ) {
-			if ( ! wp_next_scheduled( $event ) ) {
-				wp_schedule_event( $crons[ $interval ], $interval, $event );
-			}
-		}
-
-		if ( $this->get_option( 'patchstack_license_free', 0 ) == 0 ) {
-			foreach ( $premium as $event => $interval ) {
+		if ( $this->get_option( 'patchstack_clientid', false ) ) {
+			// These events should always be scheduled for activated sites.
+			foreach ( $free as $event => $interval ) {
 				if ( ! wp_next_scheduled( $event ) ) {
 					wp_schedule_event( $crons[ $interval ], $interval, $event );
+				}
+			}
+
+			// Only schedule these events for protected sites.
+			if ( $this->get_option( 'patchstack_license_free', 0 ) != 1 && $this->license_is_active() ) {
+				foreach ( $premium as $event => $interval ) {
+					if ( ! wp_next_scheduled( $event ) ) {
+						wp_schedule_event( $crons[ $interval ], $interval, $event );
+					}
 				}
 			}
 		}

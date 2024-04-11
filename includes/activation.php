@@ -41,7 +41,7 @@ class P_Activation extends P_Core {
 			return;
 		}
 
-		if ( $plugin == $this->plugin->basename ) {
+		if ( $plugin == $this->plugin->basename && ! isset( $_REQUEST['_ajax_nonce'] ) ) {
 
 			// Determine if secret token was set, if so, sync with API.
 			$attemptAuto = false;
@@ -388,6 +388,7 @@ class P_Activation extends P_Core {
 
 				return [
 					'result'  => 'error',
+					'body' => json_encode($this->plugin->api->message),
 					'message' => 'Cannot activate license!',
 				];
 			}
