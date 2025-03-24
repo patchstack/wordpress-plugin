@@ -36,11 +36,11 @@ class P_Htaccess extends P_Core {
 	 * @return void
 	 */
 	public function update_option_extras( $option_name, $old_value, $value ) {
-		if ( $old_value == $value ) {
+		if ( !in_array( $option_name, [ 'patchstack_prevent_default_file_access', 'patchstack_basic_firewall', 'patchstack_pingback_protection', 'patchstack_block_debug_log_access', 'patchstack_block_fake_bots', 'patchstack_index_views', 'patchstack_trace_and_track', 'patchstack_proxy_comment_posting', 'patchstack_image_hotlinking', 'patchstack_firewall_custom_rules' ] ) ) {
 			return;
 		}
 
-		if ( !in_array( $option_name, [ 'patchstack_prevent_default_file_access', 'patchstack_basic_firewall', 'patchstack_pingback_protection', 'patchstack_block_debug_log_access', 'patchstack_block_fake_bots', 'patchstack_index_views', 'patchstack_trace_and_track', 'patchstack_proxy_comment_posting', 'patchstack_image_hotlinking', 'patchstack_firewall_custom_rules' ] ) ) {
+		if ( $old_value == $value ) {
 			return;
 		}
 

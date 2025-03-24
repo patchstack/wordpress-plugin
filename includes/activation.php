@@ -203,7 +203,7 @@ class P_Activation extends P_Core {
 
 		// Try to create the mu-plugins folder/file.
 		// No need to do this if it already exists.
-		if ( file_exists( WPMU_PLUGIN_DIR . '/patchstack.php' ) || file_exists( WPMU_PLUGIN_DIR . '/_patchstack.php' )) {
+		if ( file_exists( WPMU_PLUGIN_DIR . '/patchstack.php' ) || file_exists( WPMU_PLUGIN_DIR . '/_patchstack.php' ) || ( defined( 'PS_DISABLE_MU' ) && PS_DISABLE_MU ) ) {
 			return;
 		}
 
@@ -490,7 +490,7 @@ class P_Activation extends P_Core {
 		}
 
 		// No need to display this error if the .htaccess functionality has been disabled.
-		if ( get_option( 'patchstack_disable_htaccess', 0 ) || ( defined( 'PS_DISABLE_HTACCESS' ) && PS_DISABLE_HTACCESS ) ) {
+		if ( get_option( 'patchstack_disable_htaccess', 0 ) || ( defined( 'PS_DISABLE_HTACCESS' ) && PS_DISABLE_HTACCESS ) || ( defined( 'PS_DISABLE_MU' ) && PS_DISABLE_MU ) ) {
 			return;
 		}
 
@@ -863,12 +863,13 @@ auto_prepend_file = '" . $mu_file_as . "'
 	 * @return void
 	 */
 	public function updated_option( $option_name, $old_value, $value ) {
-		// Not strict type matching.
-		if ( $old_value == $value ) {
+		// Only allow to run for our options.
+		if ( !in_array( $option_name, [ 'patchstack_basic_firewall', 'patchstack_license_free', 'patchstack_firewall_rules_v3_ap' ] ) ) {
 			return;
 		}
 
-		if ( !in_array( $option_name, [ 'patchstack_basic_firewall', 'patchstack_license_free', 'patchstack_firewall_rules_v3_ap' ] ) ) {
+		// Not strict type matching.
+		if ( $old_value == $value ) {
 			return;
 		}
 
