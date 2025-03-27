@@ -11,6 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 class P_Login extends P_Core {
 
 	/**
+	 * Validated request or not.
+	 * 
+	 * @param boolean
+	 */
+	private $validated = false;
+
+	/**
 	 * Add the actions required to interact with the login process.
 	 *
 	 * @param Patchstack $core
@@ -36,7 +43,6 @@ class P_Login extends P_Core {
 			add_action( 'wp_authenticate', [ $this, 'add_captcha' ] );
 			add_filter( 'woocommerce_process_registration_errors', [$this, 'general_captcha_check' ], 10, 1 );
 			add_action( 'woocommerce_before_lost_password_form', [ $this, 'add_captcha' ] );
-			add_action( 'lostpassword_post', [ $this, 'general_captcha_check' ], 1, 1 );
 		}
 
 		// 2FA related actions.
@@ -387,6 +393,11 @@ class P_Login extends P_Core {
 			add_action( 'lostpassword_form', [ $this->plugin->hardening, 'captcha_display' ] );
 			add_action( 'woocommerce_lostpassword_form', [ $this->plugin->hardening, 'captcha_display' ] );
 			add_action( 'allow_password_reset', [ $this, 'general_captcha_check' ] );
+
+			// WooCommerce only.
+			if ( class_exists( 'WooCommerce' ) ) {
+				add_action( 'lostpassword_post', [ $this, 'general_captcha_check' ], 1, 1 );
+			}
 		}
 	}
 
@@ -398,10 +409,15 @@ class P_Login extends P_Core {
 	 * @return WP_User|WP_Error
 	 */
 	public function login_captcha_check( $user, $password ) {
+		if ( $this->validated ) {
+			return $user;
+		}
+
 		$result = $this->plugin->hardening->captcha_check();
 
 		if ( ! $result['response'] ) {
 			if ( $result['reason'] === 'ERROR_NO_KEYS' ) {
+				$this->validated = true;
 				return $user;
 			}
 			$error_message = sprintf( '<strong>%s</strong>: %s', 'Error', esc_attr__( 'You have entered an incorrect reCAPTCHA value.', 'patchstack' ) );
@@ -415,6 +431,7 @@ class P_Login extends P_Core {
 				return new WP_Error( 'patchstack_error', $error_message );
 			}
 		} else {
+			$this->validated = true;
 			return $user;
 		}
 	}
@@ -427,9 +444,14 @@ class P_Login extends P_Core {
 	 * @return WP_User|WP_Error
 	 */
 	public function login_captcha_check_woocommerce( $error, $username, $password, $email ) {
+		if ( $this->validated ) {
+			return $error;
+		}
+
 		$result = $this->plugin->hardening->captcha_check();
 
 		if ( $result['response'] || $result['reason'] == 'ERROR_NO_KEYS' ) {
+			$this->validated = true;
 			return $error;
 		}
 
@@ -448,9 +470,14 @@ class P_Login extends P_Core {
 	 * @return WP_Error
 	 */
 	public function general_captcha_check( $error ) {
+		if ( $this->validated ) {
+			return $error;
+		}
+
 		$result = $this->plugin->hardening->captcha_check();
 
 		if ( $result['response'] || $result['reason'] == 'ERROR_NO_KEYS' ) {
+			$this->validated = true;
 			return $error;
 		}
 
