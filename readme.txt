@@ -64,7 +64,7 @@ Simply install the Patchstack plugin by searching for "Patchstack" on the plugin
 1. Download the plugin from the WordPress.org Patchstack plugin download page.
 2. Unzip the .zip file.
 3. Upload the entire `patchstack` directory to the `/wp-content/plugins/` directory.
-4. Activate Patchstack through the 'Plugins' menu in WordPress.
+4. Activate Patchstack through the 'Plugins' menu in WordPress and enter your API key.
 
 == Frequently Asked Questions ==
 
